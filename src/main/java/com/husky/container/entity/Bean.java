@@ -10,10 +10,6 @@ import lombok.*;
 public class Bean {
     private Object value;
     private String id;
-
-    public void yes() {
-        System.out.println("yes " + this.id);
-    }
 }
 
 

@@ -37,10 +37,6 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
         }
     }
 
-    public InputStream getResourceAsStream(String path) {
-        return getClass().getResourceAsStream("/" + path);
-    }
-
     @Override
     public Map<String, BeanDefinition> readBeanDefinition() {
         Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
@@ -68,7 +64,11 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
         return beanDefinitionMap;
     }
 
-    private BeanDefinition buildBeanDefinition(String id, String className) {
+    protected InputStream getResourceAsStream(String path) {
+        return getClass().getResourceAsStream("/" + path);
+    }
+
+    protected BeanDefinition buildBeanDefinition(String id, String className) {
         return BeanDefinition.builder()
                 .id(id)
                 .beanClassName(className)
@@ -90,7 +90,7 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
         }
     }
 
-    private String getXMLContent(InputStream inputStream) throws IOException {
+    protected String getXMLContent(InputStream inputStream) throws IOException {
         byte[] buffer = inputStream.readAllBytes();
         return new String(buffer, StandardCharsets.UTF_8);
     }

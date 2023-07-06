@@ -24,10 +24,8 @@ public class BeanDefinition {
             String propertyRef = entry.getValue();
 
             Object dependency = context.getBean(propertyRef);
-
             dependencies.put(propertyName, dependency);
         }
-
         return dependencies;
     }
 }
