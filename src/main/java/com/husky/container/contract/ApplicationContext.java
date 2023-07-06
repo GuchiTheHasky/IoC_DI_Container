@@ -9,5 +9,4 @@ public interface ApplicationContext <T> {
     T getBean(String id, Class<T> clazz);
     Object getBean(String id);
     List<String> getBeans();
-    void setBeanDefinitionReader(BeanDefinitionReader definitionReader);
 }

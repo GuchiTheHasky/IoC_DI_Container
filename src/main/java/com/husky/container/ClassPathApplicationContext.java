@@ -4,6 +4,7 @@ import com.husky.container.contract.ApplicationContext;
 import com.husky.container.contract.BeanDefinitionReader;
 import com.husky.container.entity.Bean;
 import com.husky.container.entity.BeanDefinition;
+import com.husky.container.reader.XMLBeanDefinitionReader;
 import com.husky.container.util.BeanInstantiationException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -13,10 +14,18 @@ import java.util.List;
 import java.util.Map;
 
 public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
-    private String[] paths;
+    private final String[] PATHS;
     private BeanDefinitionReader beanReader;
     private Map<String, BeanDefinition> beanDefinitions;
     private List<Bean> beans;
+
+    public ClassPathApplicationContext(String... PATHS) {
+        this.PATHS = PATHS;
+        setBeanDefinitionReader(new XMLBeanDefinitionReader());
+        loadBeanDefinitions();
+        createBeansFromBeanDefinition();
+        injectDependencies();
+    }
 
     @Override
     public T getBean(Class<T> clazz) {
@@ -57,8 +66,9 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
         return beanIds;
     }
 
-    @Override
-    public void setBeanDefinitionReader(BeanDefinitionReader definitionReader) {
+
+    private void setBeanDefinitionReader(XMLBeanDefinitionReader definitionReader) {
+        definitionReader.setPaths(PATHS);
         this.beanReader = definitionReader;
     }
 
@@ -105,7 +115,7 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
 
     private void injectDependency(Object target, String propertyName, Object dependency) {
         try {
-            String setterMethodName = "set" + capitalize(propertyName);
+            String setterMethodName = "set" + propertyName;
             Method[] methods = target.getClass().getMethods();
 
             for (Method method : methods) {
@@ -126,12 +136,5 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
 
     private BeanDefinition getBeanDefinition(String id) {
         return beanDefinitions.get(id);
-    }
-
-    private String capitalize(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 }
