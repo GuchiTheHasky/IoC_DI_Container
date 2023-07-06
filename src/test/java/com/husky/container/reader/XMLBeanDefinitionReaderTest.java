@@ -4,6 +4,7 @@ import com.husky.container.entity.BeanDefinition;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
@@ -15,11 +16,12 @@ public class XMLBeanDefinitionReaderTest {
     private final XMLBeanDefinitionReader reader = new XMLBeanDefinitionReader();
 
     @BeforeEach
-    public void setUp() {
+    public void init() {
         reader.setPaths(new String[]{"test_xml.xml"});
     }
 
     @Test
+    @DisplayName("Test, read BeanDefinition.")
     public void testReadBeanDefinition() {
         Map<String, BeanDefinition> beanDefinitions = reader.readBeanDefinition();
         int expectedBeanCount = 2;
@@ -29,12 +31,14 @@ public class XMLBeanDefinitionReaderTest {
     }
 
     @Test
+    @DisplayName("Test, get resource as stream.")
     public void testGetResourceAsStream() {
         InputStream inputStream = reader.getResourceAsStream("test_xml.xml");
         assertNotNull(inputStream);
     }
 
     @Test
+    @DisplayName("Test, build BeanDefinition.")
     public void testBuildBeanDefinition() {
         String id = "beanId";
         String className = "com.example.BeanClass";
@@ -47,6 +51,7 @@ public class XMLBeanDefinitionReaderTest {
 
     @SneakyThrows
     @Test
+    @DisplayName("Test, get content xml file.")
     public void testGetXMLContent() {
         @Cleanup InputStream inputStream = reader.getResourceAsStream("test_xml.xml");
         String expectedContent = reader.getXMLContent(inputStream);
@@ -67,5 +72,4 @@ public class XMLBeanDefinitionReaderTest {
                     </bean>
                 </beans>""";
     }
-
 }

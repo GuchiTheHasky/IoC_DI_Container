@@ -79,8 +79,7 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
                     Bean bean = buildBean(beanDefinition);
                     beans.add(bean);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Failed to retrieve beans.", e);
                 throw new BeanInstantiationException("Application initialization failed.", e);
             }
@@ -97,7 +96,7 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
     private void injectDependencies() {
         for (Bean bean : beans) {
             BeanDefinition beanDefinition = getBeanDefinition(bean.getId());
-            Map<String, Object> dependencies = beanDefinition.getDependencies( this);
+            Map<String, Object> dependencies = beanDefinition.getDependencies(this);
 
             for (Map.Entry<String, Object> entry : dependencies.entrySet()) {
                 String propertyName = entry.getKey();

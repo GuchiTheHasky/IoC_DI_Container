@@ -26,7 +26,6 @@ public class BeanDefinition {
             Object dependency = context.getBean(propertyRef);
             dependencies.put(propertyName, dependency);
         }
-
         return dependencies;
     }
 }

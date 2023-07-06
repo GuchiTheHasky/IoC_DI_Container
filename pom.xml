@@ -7,13 +7,12 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>IoCDIContainer</name>
-  <url>http://maven.apache.org</url>
-
   <properties>
+    <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+    <logback-classic.version>1.2.6</logback-classic.version>
     <lombok.version>1.18.26</lombok.version>
+    <slfj-api.version>1.7.36</slfj-api.version>
     <junit.jupiter.version>5.9.2</junit.jupiter.version>
   </properties>
 
@@ -21,24 +20,13 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.6</version>
+      <version>${logback-classic.version}</version>
     </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>1.2.6</version>
-    </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>2.0.0-alpha5</version>
-    </dependency>
-
-
-    <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-      <version>0.10.2</version>
+      <version>${slfj-api.version}</version>
     </dependency>
 
     <dependency>
@@ -62,8 +50,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>15</source>
-          <target>15</target>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
         </configuration>
       </plugin>
     </plugins>
