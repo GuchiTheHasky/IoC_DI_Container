@@ -6,6 +6,7 @@ import com.husky.container.entity.Bean;
 import com.husky.container.entity.BeanDefinition;
 import com.husky.container.reader.XMLBeanDefinitionReader;
 import com.husky.container.util.BeanInstantiationException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
     private final String[] PATHS;
     private BeanDefinitionReader beanReader;
@@ -66,39 +68,36 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
         return beanIds;
     }
 
-
-    private void setBeanDefinitionReader(XMLBeanDefinitionReader definitionReader) {
-        definitionReader.setPaths(PATHS);
-        this.beanReader = definitionReader;
-    }
-
-    public void createBeansFromBeanDefinition() {
+    private void createBeansFromBeanDefinition() {
         beans = new ArrayList<>();
-
         for (BeanDefinition beanDefinition : beanDefinitions.values()) {
-            Object beanInstance;
             try {
                 Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
-                beanInstance = beanClass.newInstance();
+                Object beanInstance = beanClass.getDeclaredConstructor().newInstance();
 
                 if (beanInstance instanceof Bean) {
-                    Bean bean = (Bean) beanInstance;
-                    bean.setValue(beanDefinition.getBeanClassName());
-                    bean.setId(beanDefinition.getId());
-
+                    Bean bean = buildBean(beanDefinition);
                     beans.add(bean);
                 }
-            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-                throw new BeanInstantiationException("Failed to create bean instance for " + beanDefinition.getId(), e);
+            }
+            catch (Exception e) {
+                log.error("Failed to retrieve beans.", e);
+                throw new BeanInstantiationException("Application initialization failed.", e);
             }
         }
     }
 
+    private Bean buildBean(BeanDefinition beanDefinition) {
+        return Bean.builder()
+                .value(beanDefinition.getBeanClassName())
+                .id(beanDefinition.getId())
+                .build();
+    }
 
-    public void injectDependencies() {
+    private void injectDependencies() {
         for (Bean bean : beans) {
             BeanDefinition beanDefinition = getBeanDefinition(bean.getId());
-            Map<String, Object> dependencies = bean.getDependencies(beanDefinition, this);
+            Map<String, Object> dependencies = beanDefinition.getDependencies( this);
 
             for (Map.Entry<String, Object> entry : dependencies.entrySet()) {
                 String propertyName = entry.getKey();
@@ -109,8 +108,13 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
         }
     }
 
-    public void loadBeanDefinitions() {
+    private void loadBeanDefinitions() {
         beanDefinitions = beanReader.readBeanDefinition();
+    }
+
+    private void setBeanDefinitionReader(XMLBeanDefinitionReader definitionReader) {
+        definitionReader.setPaths(PATHS);
+        this.beanReader = definitionReader;
     }
 
     private void injectDependency(Object target, String propertyName, Object dependency) {
@@ -130,7 +134,8 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
                 }
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new BeanInstantiationException("Failed to inject dependency for property " + propertyName, e);
+            log.error("Failed to inject dependency.");
+            throw new BeanInstantiationException("Application initialization failed.", e);
         }
     }
 
