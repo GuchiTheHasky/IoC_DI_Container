@@ -1,6 +1,7 @@
 target/
 .idea
-src/main/resources
+src/main/resources/config.xml
+src/main/resources/context.xml
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
