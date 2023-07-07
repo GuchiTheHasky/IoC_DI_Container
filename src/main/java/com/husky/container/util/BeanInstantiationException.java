@@ -1,6 +1,7 @@
 package com.husky.container.util;
 
 public class BeanInstantiationException extends RuntimeException {
+
     public BeanInstantiationException(String message) {
         super(message);
     }

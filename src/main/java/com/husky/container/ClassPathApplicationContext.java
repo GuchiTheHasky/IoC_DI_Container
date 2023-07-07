@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
+class ClassPathApplicationContext<T> implements ApplicationContext<T> {
     private final String[] PATHS;
     private BeanDefinitionReader beanReader;
     private Map<String, BeanDefinition> beanDefinitions;
@@ -23,10 +23,6 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
 
     public ClassPathApplicationContext(String... PATHS) {
         this.PATHS = PATHS;
-        setBeanDefinitionReader(new XMLBeanDefinitionReader());
-        loadBeanDefinitions();
-        createBeansFromBeanDefinition();
-        injectDependencies();
     }
 
     @Override
@@ -66,6 +62,25 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
             beanIds.add(bean.getId());
         }
         return beanIds;
+    }
+
+    @Override
+    public void setBeanDefinitionReader(BeanDefinitionReader reader) {
+        if (reader instanceof XMLBeanDefinitionReader) {
+            reader = new XMLBeanDefinitionReader();
+            ((XMLBeanDefinitionReader) reader).setPaths(PATHS);
+            this.beanReader = reader;
+            initializeBeans();
+        } else {
+            log.error("Invalid reader.");
+            throw new BeanInstantiationException("Invalid reader, try \"XMLBeanDefinitionReader\".");
+        }
+    }
+
+    private void initializeBeans() {
+        loadBeanDefinitions();
+        createBeansFromBeanDefinition();
+        injectDependencies();
     }
 
     private void createBeansFromBeanDefinition() {
@@ -111,10 +126,7 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
         beanDefinitions = beanReader.readBeanDefinition();
     }
 
-    private void setBeanDefinitionReader(XMLBeanDefinitionReader definitionReader) {
-        definitionReader.setPaths(PATHS);
-        this.beanReader = definitionReader;
-    }
+
 
     private void injectDependency(Object target, String propertyName, Object dependency) {
         try {
