@@ -41,5 +41,10 @@ public interface ApplicationContext<T> {
      */
     List<String> getBeans();
 
+    /**
+     * Sets the BeanDefinitionReader for reading bean definitions.
+     *
+     * @param reader the BeanDefinitionReader to be set
+     */
     void setBeanDefinitionReader(BeanDefinitionReader reader);
 }

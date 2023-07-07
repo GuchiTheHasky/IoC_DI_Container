@@ -6,7 +6,6 @@ import com.husky.container.entity.Bean;
 import com.husky.container.entity.BeanDefinition;
 import com.husky.container.reader.XMLBeanDefinitionReader;
 import com.husky.container.util.BeanInstantiationException;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
@@ -71,13 +70,17 @@ class ClassPathApplicationContext<T> implements ApplicationContext<T> {
             reader = new XMLBeanDefinitionReader();
             ((XMLBeanDefinitionReader) reader).setPaths(PATHS);
             this.beanReader = reader;
-            loadBeanDefinitions();
-            createBeansFromBeanDefinition();
-            injectDependencies();
+            initializeBeans();
         } else {
             log.error("Invalid reader.");
             throw new BeanInstantiationException("Invalid reader, try \"XMLBeanDefinitionReader\".");
         }
+    }
+
+    private void initializeBeans() {
+        loadBeanDefinitions();
+        createBeansFromBeanDefinition();
+        injectDependencies();
     }
 
     private void createBeansFromBeanDefinition() {
