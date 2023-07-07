@@ -11,6 +11,10 @@ import lombok.*;
 public class Bean {
     private Object value;
     private String id;
+
+    public void f(){
+        System.out.println("fffffffffffffffff");
+    }
 }
 
 

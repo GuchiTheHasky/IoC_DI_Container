@@ -23,7 +23,7 @@ public class XMLValidator {
             validator.validate(new StreamSource(new StringReader(xmlString)));
         } catch (Exception e) {
             log.error("XML is invalid.", e);
-            throw new BeanInstantiationException("Application initialization failed." + e.getMessage());
+            throw new BeanInstantiationException("Application initialization failed." + e);
         }
     }
 }

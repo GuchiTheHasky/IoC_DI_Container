@@ -2,6 +2,7 @@ target/
 .idea
 src/main/resources/config.xml
 src/main/resources/context.xml
+src/main/java/com/husky/container/test.java
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

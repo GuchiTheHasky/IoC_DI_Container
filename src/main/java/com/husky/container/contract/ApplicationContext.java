@@ -40,4 +40,6 @@ public interface ApplicationContext<T> {
      * @return a list of bean IDs
      */
     List<String> getBeans();
+
+    void setBeanDefinitionReader(BeanDefinitionReader reader);
 }
