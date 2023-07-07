@@ -53,7 +53,7 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
     public Object getBean(String id) {
         for (Bean bean : beans) {
             if (bean.getId().equals(id)) {
-                return (T) bean;
+                return bean;
             }
         }
         return null;

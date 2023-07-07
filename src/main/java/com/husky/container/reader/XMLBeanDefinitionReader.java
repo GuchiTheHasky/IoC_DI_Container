@@ -41,7 +41,6 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
     public Map<String, BeanDefinition> readBeanDefinition() {
         Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
         for (String path : paths) {
-
             NodeList beanList = getBeanList(path);
             for (int i = 0; i < beanList.getLength(); i++) {
                 Element beanElement = (Element) beanList.item(i);
@@ -49,19 +48,27 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
                 String className = beanElement.getAttribute("class");
 
                 BeanDefinition beanDefinition = buildBeanDefinition(id, className);
-
-                NodeList propertyNodes = beanElement.getElementsByTagName("property");
-                for (int j = 0; j < propertyNodes.getLength(); j++) {
-                    Element propertyElement = (Element) propertyNodes.item(j);
-                    String propertyName = propertyElement.getAttribute("name");
-                    String propertyValue = propertyElement.getAttribute("value");
-
-                    beanDefinition.getDependencies().put(propertyName, propertyValue);
-                }
+                fillDependencyCache(beanElement, beanDefinition);
                 beanDefinitionMap.put(id, beanDefinition);
             }
         }
         return beanDefinitionMap;
+    }
+
+    private void fillDependencyCache(Element beanElement, BeanDefinition beanDefinition) {
+        NodeList propertyNodes = beanElement.getElementsByTagName("property");
+        for (int j = 0; j < propertyNodes.getLength(); j++) {
+            Element propertyElement = (Element) propertyNodes.item(j);
+            String propertyName = propertyElement.getAttribute("name");
+            String propertyValue = propertyElement.getAttribute("value");
+            String propertyRef = propertyElement.getAttribute("ref");
+
+            if (!propertyRef.isEmpty()) {
+                beanDefinition.getRefDependencies().put(propertyName, propertyRef);
+            } else {
+                beanDefinition.getDependencies().put(propertyName, propertyValue);
+            }
+        }
     }
 
     protected InputStream getResourceAsStream(String path) {
@@ -73,6 +80,7 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
                 .id(id)
                 .beanClassName(className)
                 .dependencies(new HashMap<>())
+                .refDependencies(new HashMap<>())
                 .build();
     }
 
