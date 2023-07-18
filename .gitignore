@@ -1,5 +1,6 @@
 target/
 .idea
+src/main/java/draft
 src/main/resources/config.xml
 src/main/resources/context.xml
 src/main/java/com/husky/container/test.java

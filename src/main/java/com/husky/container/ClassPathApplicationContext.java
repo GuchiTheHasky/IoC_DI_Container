@@ -2,155 +2,144 @@ package com.husky.container;
 
 import com.husky.container.contract.ApplicationContext;
 import com.husky.container.contract.BeanDefinitionReader;
-import com.husky.container.entity.Bean;
 import com.husky.container.entity.BeanDefinition;
 import com.husky.container.reader.XMLBeanDefinitionReader;
 import com.husky.container.util.BeanInstantiationException;
 import lombok.extern.slf4j.Slf4j;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
-class ClassPathApplicationContext<T> implements ApplicationContext<T> {
-    private final String[] PATHS;
+class ClassPathApplicationContext implements ApplicationContext {
     private BeanDefinitionReader beanReader;
     private Map<String, BeanDefinition> beanDefinitions;
-    private List<Bean> beans;
+    private Map<String, Object> beans;
 
-    public ClassPathApplicationContext(String... PATHS) {
-        this.PATHS = PATHS;
+    public ClassPathApplicationContext(String... paths) {
+        this.beanReader = new XMLBeanDefinitionReader(paths);
+        this.beanDefinitions = beanReader.readBeanDefinition();
+        this.beans = new HashMap<>();
+        initializeBeans();
     }
 
     @Override
-    public T getBean(Class<T> clazz) {
-        for (Bean bean : beans) {
+    public <T> T getBean(Class<T> clazz) {
+        for (Object bean : beans.values()) {
             if (clazz.isInstance(bean)) {
-                return (T) bean;
+                return clazz.cast(bean);
             }
         }
         return null;
     }
 
     @Override
-    public T getBean(String id, Class<T> clazz) {
-        for (Bean bean : beans) {
-            if (bean.getId().equals(id) && clazz.isInstance(bean)) {
-                return (T) bean;
-            }
+    public <T> T getBean(String id, Class<T> clazz) {
+        Object bean = beans.get(id);
+        if (clazz.isInstance(bean)) {
+            return clazz.cast(bean);
         }
         return null;
     }
 
     @Override
     public Object getBean(String id) {
-        for (Bean bean : beans) {
-            if (bean.getId().equals(id)) {
-                return bean;
-            }
-        }
-        return null;
+        return beans.get(id);
     }
 
     @Override
     public List<String> getBeans() {
-        List<String> beanIds = new ArrayList<>();
-        for (Bean bean : beans) {
-            beanIds.add(bean.getId());
-        }
-        return beanIds;
-    }
-
-    @Override
-    public void setBeanDefinitionReader(BeanDefinitionReader reader) {
-        if (reader instanceof XMLBeanDefinitionReader) {
-            reader = new XMLBeanDefinitionReader();
-            ((XMLBeanDefinitionReader) reader).setPaths(PATHS);
-            this.beanReader = reader;
-            initializeBeans();
-        } else {
-            log.error("Invalid reader.");
-            throw new BeanInstantiationException("Invalid reader, try \"XMLBeanDefinitionReader\".");
-        }
+        return new ArrayList<>(beans.keySet());
     }
 
     private void initializeBeans() {
-        loadBeanDefinitions();
-        createBeansFromBeanDefinition();
+        for (Map.Entry<String, BeanDefinition> entry : beanDefinitions.entrySet()) {
+            String beanId = entry.getKey();
+            BeanDefinition beanDefinition = entry.getValue();
+
+            if (!beans.containsKey(beanId)) {
+                Object beanInstance = createBeanFromBeanDefinition(beanDefinition);
+                beans.put(beanId, beanInstance);
+            }
+        }
         injectDependencies();
     }
 
-    private void createBeansFromBeanDefinition() {
-        beans = new ArrayList<>();
-        for (BeanDefinition beanDefinition : beanDefinitions.values()) {
-            try {
-                Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
-                Object beanInstance = beanClass.getDeclaredConstructor().newInstance();
-
-                if (beanInstance instanceof Bean) {
-                    Bean bean = buildBean(beanDefinition);
-                    beans.add(bean);
-                }
-            } catch (Exception e) {
-                log.error("Failed to retrieve beans.", e);
-                throw new BeanInstantiationException("Application initialization failed.", e);
-            }
+    Object createBeanFromBeanDefinition(BeanDefinition beanDefinition) {
+        try {
+            Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
+            return beanClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            log.error("Failed to create bean instance for class: {}", beanDefinition.getBeanClassName(), e);
+            throw new BeanInstantiationException("Failed to create bean instance", e);
         }
-    }
-
-    private Bean buildBean(BeanDefinition beanDefinition) {
-        return Bean.builder()
-                .value(beanDefinition.getBeanClassName())
-                .id(beanDefinition.getId())
-                .build();
     }
 
     private void injectDependencies() {
-        for (Bean bean : beans) {
-            BeanDefinition beanDefinition = getBeanDefinition(bean.getId());
-            Map<String, Object> dependencies = beanDefinition.getDependencies(this);
+        for (Map.Entry<String, BeanDefinition> entry : beanDefinitions.entrySet()) {
+            String beanId = entry.getKey();
+            BeanDefinition beanDefinition = entry.getValue();
+            Object beanInstance = beans.get(beanId);
 
-            for (Map.Entry<String, Object> entry : dependencies.entrySet()) {
-                String propertyName = entry.getKey();
-                Object dependency = entry.getValue();
-
-                injectDependency(bean.getValue(), propertyName, dependency);
-            }
+            injectPropertyDependencies(beanDefinition.getDependencies(), beanInstance);
+            injectRefDependencies(beanDefinition.getRefDependencies(), beanInstance);
         }
     }
 
-    private void loadBeanDefinitions() {
-        beanDefinitions = beanReader.readBeanDefinition();
+    private void injectPropertyDependencies(Map<String, String> dependencies, Object beanInstance) {
+        for (Map.Entry<String, String> dependencyEntry : dependencies.entrySet()) {
+            String propertyName = dependencyEntry.getKey();
+            String propertyValue = dependencyEntry.getValue();
+            setPropertyValue(beanInstance, propertyName, propertyValue);
+        }
     }
 
+    private void injectRefDependencies(Map<String, String> refDependencies, Object beanInstance) {
+        for (Map.Entry<String, String> refDependencyEntry : refDependencies.entrySet()) {
+            String propertyName = refDependencyEntry.getKey();
+            String refBeanId = refDependencyEntry.getValue();
+            Object refBeanInstance = beans.get(refBeanId);
+            setPropertyValue(beanInstance, propertyName, refBeanInstance);
+        }
+    }
 
-
-    private void injectDependency(Object target, String propertyName, Object dependency) {
+    void setPropertyValue(Object beanInstance, String propertyName, Object propertyValue) {
         try {
-            String setterMethodName = "set" + propertyName;
-            Method[] methods = target.getClass().getMethods();
+            Class<?> beanClass = beanInstance.getClass();
+            Field field = beanClass.getDeclaredField(propertyName);
+            field.setAccessible(true);
 
-            for (Method method : methods) {
-                if (method.getName().equals(setterMethodName)) {
-                    Class<?>[] parameterTypes = method.getParameterTypes();
-                    if (parameterTypes.length == 1) {
-                        if (parameterTypes[0].isAssignableFrom(dependency.getClass())) {
-                            method.invoke(target, dependency);
-                            return;
-                        }
-                    }
-                }
+            Class<?> fieldType = field.getType();
+            Object convertedValue;
+
+            if (propertyValue == null) {
+                convertedValue = null;
+            } else if (fieldType == String.class) {
+                convertedValue = propertyValue.toString();
+            } else if (fieldType == int.class) {
+                convertedValue = Integer.parseInt((String) propertyValue);
+            } else {
+                convertedValue = convertValue(propertyValue, fieldType);
             }
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error("Failed to inject dependency.");
-            throw new BeanInstantiationException("Application initialization failed.", e);
+
+            field.set(beanInstance, convertedValue);
+        } catch (Exception e) {
+            log.error("Failed to set property value for property: " +
+                    propertyName + " on bean instance: " + beanInstance, e);
+            throw new BeanInstantiationException("Invalid property value.");
         }
     }
 
-    private BeanDefinition getBeanDefinition(String id) {
-        return beanDefinitions.get(id);
+    Object convertValue(Object value, Class<?> clazz) {
+        if (value == null) {
+            return null;
+        } else if (clazz.isAssignableFrom(value.getClass())) {
+            return value;
+        } else {
+            return clazz.cast(value);
+        }
     }
 }

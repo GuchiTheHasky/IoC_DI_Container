@@ -2,7 +2,7 @@ package com.husky.container.reader;
 
 import com.husky.container.contract.BeanDefinitionReader;
 import com.husky.container.entity.BeanDefinition;
-import com.husky.container.util.BeanInstantiationException;
+import com.husky.container.util.ReaderInstantiationException;
 import com.husky.container.util.XMLValidator;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,12 +27,13 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
     private DocumentBuilderFactory documentBuilderFactory;
     private DocumentBuilder documentBuilder;
 
-    public XMLBeanDefinitionReader() {
+    public XMLBeanDefinitionReader(String... paths) {
+        this.paths = paths;
         documentBuilderFactory = DocumentBuilderFactory.newInstance();
         try {
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new BeanInstantiationException("Failed to create DocumentBuilder", e);
+        } catch (Exception e) {
+            throw new ReaderInstantiationException("Failed to create DocumentBuilder", e);
         }
     }
 
@@ -55,7 +55,7 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
         return beanDefinitionMap;
     }
 
-    private void fillDependencyCache(Element beanElement, BeanDefinition beanDefinition) {
+    void fillDependencyCache(Element beanElement, BeanDefinition beanDefinition) {
         NodeList propertyNodes = beanElement.getElementsByTagName("property");
         for (int j = 0; j < propertyNodes.getLength(); j++) {
             Element propertyElement = (Element) propertyNodes.item(j);
@@ -71,11 +71,11 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
         }
     }
 
-    protected InputStream getResourceAsStream(String path) {
+    InputStream getResourceAsStream(String path) {
         return getClass().getResourceAsStream("/" + path);
     }
 
-    protected BeanDefinition buildBeanDefinition(String id, String className) {
+    BeanDefinition buildBeanDefinition(String id, String className) {
         return BeanDefinition.builder()
                 .id(id)
                 .beanClassName(className)
@@ -84,7 +84,7 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
                 .build();
     }
 
-    private NodeList getBeanList(String path) {
+    NodeList getBeanList(String path) {
         try (InputStream inputStream = getResourceAsStream(path)) {
             String xmlContent = getXMLContent(inputStream);
             XMLValidator.validate(xmlContent);
@@ -94,11 +94,11 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
             return root.getElementsByTagName("bean");
         } catch (IOException | SAXException e) {
             log.error("Failed to parse XML content.", e);
-            throw new BeanInstantiationException("Application initialization failed.", e);
+            throw new ReaderInstantiationException("Application initialization failed.", e);
         }
     }
 
-    protected String getXMLContent(InputStream inputStream) throws IOException {
+    String getXMLContent(InputStream inputStream) throws IOException {
         byte[] buffer = inputStream.readAllBytes();
         return new String(buffer, StandardCharsets.UTF_8);
     }

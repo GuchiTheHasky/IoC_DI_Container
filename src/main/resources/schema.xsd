@@ -1,12 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xs:element name="beans">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="bean" maxOccurs="unbounded"/>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="bean"/>
+                    <xs:element name="import">
+                        <xs:complexType>
+                            <xs:attribute name="resource" type="xs:string" use="required"/>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:choice>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
 </xs:schema>
+

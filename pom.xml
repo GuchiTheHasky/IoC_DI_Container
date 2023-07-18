@@ -3,15 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.husky</groupId>
-  <artifactId>IoCDIContainer</artifactId>
+  <artifactId>ioc-di-container</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
     <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <logback-classic.version>1.2.6</logback-classic.version>
+    <logback-classic.version>1.4.8</logback-classic.version>
     <lombok.version>1.18.26</lombok.version>
+    <mokito-core.version>5.4.0</mokito-core.version>
     <slfj-api.version>1.7.36</slfj-api.version>
     <junit.jupiter.version>5.9.2</junit.jupiter.version>
   </properties>
@@ -24,16 +25,17 @@
     </dependency>
 
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slfj-api.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>${lombok.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mokito-core.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
