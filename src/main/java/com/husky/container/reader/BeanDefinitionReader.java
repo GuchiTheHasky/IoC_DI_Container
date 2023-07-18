@@ -1,4 +1,4 @@
-package com.husky.container.contract;
+package com.husky.container.reader;
 
 import com.husky.container.entity.BeanDefinition;
 

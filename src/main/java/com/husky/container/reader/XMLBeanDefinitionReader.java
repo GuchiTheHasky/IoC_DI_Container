@@ -1,9 +1,7 @@
 package com.husky.container.reader;
 
-import com.husky.container.contract.BeanDefinitionReader;
 import com.husky.container.entity.BeanDefinition;
-import com.husky.container.util.ReaderInstantiationException;
-import com.husky.container.util.XMLValidator;
+import com.husky.container.exception.ReaderInstantiationException;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;

@@ -9,8 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class Bean {
-    private Object value;
     private String id;
+    private Object value;
 }
 
 

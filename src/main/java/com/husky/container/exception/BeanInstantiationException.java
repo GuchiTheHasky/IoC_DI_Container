@@ -1,4 +1,4 @@
-package com.husky.container.util;
+package com.husky.container.exception;
 
 public class BeanInstantiationException extends RuntimeException {
 

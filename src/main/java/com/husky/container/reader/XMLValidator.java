@@ -1,5 +1,6 @@
-package com.husky.container.util;
+package com.husky.container.reader;
 
+import com.husky.container.exception.BeanInstantiationException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.XMLConstants;
@@ -22,7 +23,7 @@ public class XMLValidator {
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new StringReader(xmlString)));
         } catch (Exception e) {
-            //log.error("XML is invalid.", e);
+            log.error("XML is invalid.", e);
             throw new BeanInstantiationException("Application initialization failed." + e);
         }
     }

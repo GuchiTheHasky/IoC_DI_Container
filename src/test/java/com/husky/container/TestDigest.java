@@ -1,7 +1,8 @@
 package com.husky.container;
 
+import com.husky.container.context.ClassPathApplicationContextITest;
 import com.husky.container.reader.XMLBeanDefinitionReaderTest;
-import com.husky.container.util.XMLValidatorTest;
+import com.husky.container.reader.XMLValidatorTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +26,8 @@ public class TestDigest {
         contextITestTest.testConvertValue();
         contextITestTest.testCreateBeanFromBeanDefinition();
         contextITestTest.testCreateBeanFromBeanDefinitionThrowException();
+        contextITestTest.testInjectPropertyDependencies();
+        contextITestTest.testInjectRefDependencies();
     }
 
     @Test

@@ -1,10 +1,9 @@
-package com.husky.container;
+package com.husky.container.context;
 
-import com.husky.container.contract.ApplicationContext;
-import com.husky.container.contract.BeanDefinitionReader;
+import com.husky.container.reader.BeanDefinitionReader;
 import com.husky.container.entity.BeanDefinition;
 import com.husky.container.reader.XMLBeanDefinitionReader;
-import com.husky.container.util.BeanInstantiationException;
+import com.husky.container.exception.BeanInstantiationException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -89,7 +88,7 @@ class ClassPathApplicationContext implements ApplicationContext {
         }
     }
 
-    private void injectPropertyDependencies(Map<String, String> dependencies, Object beanInstance) {
+    void injectPropertyDependencies(Map<String, String> dependencies, Object beanInstance) {
         for (Map.Entry<String, String> dependencyEntry : dependencies.entrySet()) {
             String propertyName = dependencyEntry.getKey();
             String propertyValue = dependencyEntry.getValue();
@@ -97,7 +96,7 @@ class ClassPathApplicationContext implements ApplicationContext {
         }
     }
 
-    private void injectRefDependencies(Map<String, String> refDependencies, Object beanInstance) {
+    void injectRefDependencies(Map<String, String> refDependencies, Object beanInstance) {
         for (Map.Entry<String, String> refDependencyEntry : refDependencies.entrySet()) {
             String propertyName = refDependencyEntry.getKey();
             String refBeanId = refDependencyEntry.getValue();

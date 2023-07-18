@@ -1,14 +1,14 @@
-package com.husky.container;
+package com.husky.container.context;
 
-import com.husky.container.entity.BeanDefinition;
-import com.husky.container.entity.MailService;
-import com.husky.container.entity.PaymentService;
-import com.husky.container.entity.UserService;
-import com.husky.container.util.BeanInstantiationException;
+import com.husky.container.entity.*;
+import com.husky.container.exception.BeanInstantiationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -38,6 +38,9 @@ public class ClassPathApplicationContextITest {
         assertEquals(expectedPaymentType, paymentService.getPaymentType());
         assertEquals(expectedMailServiceProtocol, mailService.getProtocol());
         assertEquals(expectedMailServiceTimeout, mailService.getTimeout());
+
+        assertSame(mailService, paymentService.getMailService());
+        assertSame(mailService, userService.getMailService());
     }
 
     @Test
@@ -60,6 +63,9 @@ public class ClassPathApplicationContextITest {
         assertEquals(expectedPaymentType, paymentService.getPaymentType());
         assertEquals(expectedMailServiceProtocol, mailService.getProtocol());
         assertEquals(expectedMailServiceTimeout, mailService.getTimeout());
+
+        assertSame(mailService, paymentService.getMailService());
+        assertSame(mailService, userService.getMailService());
     }
 
     @Test
@@ -82,6 +88,9 @@ public class ClassPathApplicationContextITest {
         assertEquals(expectedPaymentType, paymentService.getPaymentType());
         assertEquals(expectedMailServiceProtocol, mailService.getProtocol());
         assertEquals(expectedMailServiceTimeout, mailService.getTimeout());
+
+        assertSame(mailService, paymentService.getMailService());
+        assertSame(mailService, userService.getMailService());
     }
 
     @Test
@@ -136,4 +145,35 @@ public class ClassPathApplicationContextITest {
 
         assertThrows(BeanInstantiationException.class, () -> appContext.createBeanFromBeanDefinition(beanDefinition));
     }
+
+    @Test
+    @DisplayName("Test, inject value dependencies.")
+    public void testInjectPropertyDependencies() {
+        Map<String, String> dependencies = new HashMap<>();
+        dependencies.put("protocol", "POP3");
+        dependencies.put("timeout", "2000");
+
+        MailService mailService = new MailService();
+
+        appContext.injectPropertyDependencies(dependencies, mailService);
+
+        assertEquals("POP3", mailService.getProtocol());
+        assertEquals(2000, mailService.getTimeout());
+    }
+
+    @Test
+    @DisplayName("Test, inject ref dependencies.")
+    public void testInjectRefDependencies() {
+        Map<String, String> refDependencies = new HashMap<>();
+        refDependencies.put("mailService", "mailService");
+
+        PaymentService paymentService = new PaymentService();
+
+        appContext.injectRefDependencies(refDependencies, paymentService);
+        assertEquals(MailService.class, paymentService.getMailService().getClass());
+        assertSame(appContext.getBean("mailService"), paymentService.getMailService());
+    }
+
 }
+
+
