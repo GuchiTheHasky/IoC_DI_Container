@@ -23,7 +23,6 @@ public class TestDigest {
         contextITestTest.testCreateBeansWithValueAndRefDependenciesUsedClass();
         contextITestTest.testCreateBeansWithValueAndRefDependenciesUsedId();
         contextITestTest.testGetListOfBeans();
-        contextITestTest.testConvertValue();
         contextITestTest.testCreateBeanFromBeanDefinition();
         contextITestTest.testCreateBeanFromBeanDefinitionThrowException();
         contextITestTest.testInjectPropertyDependencies();

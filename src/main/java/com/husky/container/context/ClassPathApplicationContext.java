@@ -112,33 +112,19 @@ class ClassPathApplicationContext implements ApplicationContext {
             field.setAccessible(true);
 
             Class<?> fieldType = field.getType();
-            Object convertedValue;
+            Object convertedValue = null;
 
-            if (propertyValue == null) {
-                convertedValue = null;
-            } else if (fieldType == String.class) {
-                convertedValue = propertyValue.toString();
+            if (fieldType.isAssignableFrom(propertyValue.getClass())) {
+                convertedValue = propertyValue;
             } else if (fieldType == int.class) {
                 convertedValue = Integer.parseInt((String) propertyValue);
-            } else {
-                convertedValue = convertValue(propertyValue, fieldType);
             }
-
+            
             field.set(beanInstance, convertedValue);
         } catch (Exception e) {
             log.error("Failed to set property value for property: " +
                     propertyName + " on bean instance: " + beanInstance, e);
             throw new BeanInstantiationException("Invalid property value.");
-        }
-    }
-
-    Object convertValue(Object value, Class<?> clazz) {
-        if (value == null) {
-            return null;
-        } else if (clazz.isAssignableFrom(value.getClass())) {
-            return value;
-        } else {
-            return clazz.cast(value);
         }
     }
 }

@@ -1,5 +1,7 @@
 <configuration>
+
     <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/application.log</file>
         <encoder>

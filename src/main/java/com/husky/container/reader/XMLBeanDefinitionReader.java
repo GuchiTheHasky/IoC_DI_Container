@@ -46,14 +46,14 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
                 String className = beanElement.getAttribute("class");
 
                 BeanDefinition beanDefinition = buildBeanDefinition(id, className);
-                fillDependencyCache(beanElement, beanDefinition);
+                fillDependency(beanElement, beanDefinition);
                 beanDefinitionMap.put(id, beanDefinition);
             }
         }
         return beanDefinitionMap;
     }
 
-    void fillDependencyCache(Element beanElement, BeanDefinition beanDefinition) {
+    void fillDependency(Element beanElement, BeanDefinition beanDefinition) {
         NodeList propertyNodes = beanElement.getElementsByTagName("property");
         for (int j = 0; j < propertyNodes.getLength(); j++) {
             Element propertyElement = (Element) propertyNodes.item(j);

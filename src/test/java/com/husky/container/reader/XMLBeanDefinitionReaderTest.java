@@ -98,7 +98,7 @@ public class XMLBeanDefinitionReaderTest {
         beanDefinition.setDependencies(new HashMap<>());
         beanDefinition.setRefDependencies(new HashMap<>());
 
-        reader.fillDependencyCache(beanElement, beanDefinition);
+        reader.fillDependency(beanElement, beanDefinition);
 
         int expectedDependenciesCount = 1;
         int expectedRefDependenciesCount = 1;

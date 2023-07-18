@@ -17,7 +17,6 @@ public interface ApplicationContext {
     /**
      * Retrieves a bean of the specified class and ID from the application context.
      *
-
      */
     <T> T getBean(String id, Class<T> clazz);
 

@@ -110,22 +110,6 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test, convert value.")
-    public void testConvertValue() {
-        String expectedStrValue = "Guchi";
-        String actualStrValue = (String) appContext.convertValue("Guchi", String.class);
-
-        int expectedIntValue = 2000;
-        int actualIntValue = Integer.parseInt((String) appContext.convertValue("2000", String.class));
-
-        String actualNullValue = (String) appContext.convertValue(null, String.class);
-
-        assertEquals(expectedStrValue, actualStrValue);
-        assertEquals(expectedIntValue, actualIntValue);
-        assertNull(actualNullValue);
-    }
-
-    @Test
     @DisplayName("Test, create bean from bean definition.")
     public void testCreateBeanFromBeanDefinition() {
         BeanDefinition beanDefinition = mock(BeanDefinition.class);
