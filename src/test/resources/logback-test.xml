@@ -13,11 +13,11 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="com.husky.container.reader.XMLBeanDefinitionReader" level="debug">
+    <logger name="com.husky.container.reader.dom.DOMBeanDefinitionReader" level="debug">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="com.husky.container.reader.XMLValidator" level="debug">
+    <logger name="com.husky.container.reader.dom.XSDValidator" level="debug">
         <appender-ref ref="FILE"/>
     </logger>
 

@@ -1,8 +1,8 @@
 package com.husky.container;
 
 import com.husky.container.context.ClassPathApplicationContextITest;
-import com.husky.container.reader.XMLBeanDefinitionReaderTest;
-import com.husky.container.reader.XMLValidatorTest;
+import com.husky.container.reader.dom.DOMBeanDefinitionReaderTest;
+import com.husky.container.reader.dom.XSDValidatorTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +10,7 @@ public class TestDigest {
     @Test
     @DisplayName("XMLValidatorTests")
     public void testXMLValidator() {
-        XMLValidatorTest xmlValidatorTest = new XMLValidatorTest();
+        XSDValidatorTest xmlValidatorTest = new XSDValidatorTest();
         xmlValidatorTest.testValidateXMLSchema();
         xmlValidatorTest.testValidateXMLSchemaThrowException();
     }
@@ -25,18 +25,15 @@ public class TestDigest {
         contextITestTest.testGetListOfBeans();
         contextITestTest.testCreateBeanFromBeanDefinition();
         contextITestTest.testCreateBeanFromBeanDefinitionThrowException();
-        contextITestTest.testInjectPropertyDependencies();
-        contextITestTest.testInjectRefDependencies();
     }
 
     @Test
     @DisplayName("XMLBeanDefinitionReaderTest")
     public void testXMLBeanDefinitionReader() {
-        XMLBeanDefinitionReaderTest xmlReaderTest = new XMLBeanDefinitionReaderTest();
+        DOMBeanDefinitionReaderTest xmlReaderTest = new DOMBeanDefinitionReaderTest();
         xmlReaderTest.init();
         xmlReaderTest.testBuildBeanDefinition();
         xmlReaderTest.testGetResourceAsStream();
-        xmlReaderTest.testGetXMLContent();
         xmlReaderTest.testReadBeanDefinition();
         xmlReaderTest.testGetBeanList();
         xmlReaderTest.testFillAllDependenciesInBeanDefinition();

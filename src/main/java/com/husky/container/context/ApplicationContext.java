@@ -33,5 +33,5 @@ public interface ApplicationContext {
      *
      * @return a list of bean IDs
      */
-    List<String> getBeans();
+    List<String> getBeansNames();
 }

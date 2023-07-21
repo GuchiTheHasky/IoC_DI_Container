@@ -41,3 +41,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/src/main/resources/default_content_test.xml
+/src/main/resources/default_import_content_test.xml
+/src/main/java/com/husky/container/entity/MailService.java
+/src/main/java/com/husky/container/entity/PaymentService.java
+/src/main/java/com/husky/container/entity/UserService.java

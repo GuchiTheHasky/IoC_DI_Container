@@ -2,6 +2,7 @@ package com.husky.container.reader;
 
 import com.husky.container.entity.BeanDefinition;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,5 +15,5 @@ public interface BeanDefinitionReader {
      *
      * @return a map of bean definitions, where the key is the bean ID and the value is the BeanDefinition object
      */
-    Map<String, BeanDefinition> readBeanDefinition();
+    List<BeanDefinition> readBeanDefinition();
 }

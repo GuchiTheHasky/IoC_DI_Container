@@ -1,7 +1,6 @@
-package com.husky.container.reader;
+package com.husky.container.reader.dom;
 
 import com.husky.container.entity.BeanDefinition;
-import lombok.Cleanup;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,13 +15,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class XMLBeanDefinitionReaderTest {
-    private final XMLBeanDefinitionReader reader = new XMLBeanDefinitionReader();
+public class DOMBeanDefinitionReaderTest { // todo розділити інтеграційні тести від юніт тестів
+    private final DOMBeanDefinitionReader reader = new DOMBeanDefinitionReader();
 
     @BeforeEach
     public void init() {
@@ -32,7 +31,7 @@ public class XMLBeanDefinitionReaderTest {
     @Test
     @DisplayName("Test, read BeanDefinition.")
     public void testReadBeanDefinition() {
-        Map<String, BeanDefinition> beanDefinitions = reader.readBeanDefinition();
+        List<BeanDefinition> beanDefinitions = reader.readBeanDefinition();
         int expectedBeanCount = 2;
         int actualBeanCount = beanDefinitions.size();
         assertNotNull(beanDefinitions);
@@ -56,16 +55,6 @@ public class XMLBeanDefinitionReaderTest {
         assertEquals(id, beanDefinition.getId());
         assertEquals(className, beanDefinition.getBeanClassName());
         assertNotNull(beanDefinition.getDependencies());
-    }
-
-    @SneakyThrows
-    @Test
-    @DisplayName("Test, get content xml file.")
-    public void testGetXMLContent() {
-        @Cleanup InputStream inputStream = reader.getResourceAsStream("default_content_test.xml");
-        String expectedContent = reader.getXMLContent(inputStream);
-        String actualContent = getTestXMLContent().replaceAll("\n", "\r\n");
-        assertEquals(expectedContent, actualContent);
     }
 
     @Test
