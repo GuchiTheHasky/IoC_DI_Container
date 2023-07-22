@@ -3,12 +3,13 @@ package com.husky.container.reader.sax;
 import com.husky.container.entity.BeanDefinition;
 import com.husky.container.exception.XMLReaderException;
 import com.husky.container.reader.BeanDefinitionReader;
-import com.husky.container.reader.xsd.XSDValidator;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.ByteArrayInputStream;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,12 @@ public class SAXBeanDefinitionReader implements BeanDefinitionReader {
 
     public SAXBeanDefinitionReader(String... paths) {
         this.paths = paths;
-        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try {
+            Schema schema = schemaFactory.newSchema(getClass().getResource("/" + XSD_SCHEMA));
+            SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+            saxParserFactory.setSchema(schema);
             saxParser = saxParserFactory.newSAXParser();
         } catch (Exception e) {
             log.error("Failed to create SAXParser", e);
@@ -34,10 +39,7 @@ public class SAXBeanDefinitionReader implements BeanDefinitionReader {
     public List<BeanDefinition> readBeanDefinition() {
         List<BeanDefinition> beanDefinitions = new ArrayList<>();
         for (String path : paths) {
-            try (InputStream streamContent = getResourceAsStream(path)) {
-                ByteArrayInputStream content = new ByteArrayInputStream(streamContent.readAllBytes());
-                XSDValidator.validate(content, XSD_SCHEMA);
-                content.reset();
+            try (InputStream content = getResourceAsStream(path)) {
                 SAXHandler handler = new SAXHandler();
                 saxParser.parse(content, handler);
                 beanDefinitions.addAll(handler.getBeanDefinitions());

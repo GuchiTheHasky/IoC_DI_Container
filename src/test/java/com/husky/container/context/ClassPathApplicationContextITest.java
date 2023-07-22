@@ -3,7 +3,7 @@ package com.husky.container.context;
 import com.husky.container.entity.MailService;
 import com.husky.container.entity.PaymentService;
 import com.husky.container.entity.UserService;
-import com.husky.container.exception.BeanInstantiationException;
+import com.husky.container.exception.NoUniqueBeanDefinitionException;
 import com.husky.container.reader.sax.SAXBeanDefinitionReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -208,8 +208,8 @@ public class ClassPathApplicationContextITest {
         ClassPathApplicationContext domContext = new ClassPathApplicationContext(MULTIPLY_BEAN_DEFINITION_PATH);
         ClassPathApplicationContext saxContext = new ClassPathApplicationContext
                 (new SAXBeanDefinitionReader(MULTIPLY_BEAN_DEFINITION_PATH));
-        assertThrows(BeanInstantiationException.class, () -> domContext.validateClass(PaymentService.class));
-        assertThrows(BeanInstantiationException.class, () -> saxContext.validateClass(PaymentService.class));
+        assertThrows(NoUniqueBeanDefinitionException.class, () -> domContext.validateClass(PaymentService.class));
+        assertThrows(NoUniqueBeanDefinitionException.class, () -> saxContext.validateClass(PaymentService.class));
     }
 }
 
