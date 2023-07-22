@@ -13,14 +13,14 @@ import java.util.Map;
 @Slf4j
 public class BeanCreator {
 
-        public static Map<String, Bean> createBeans(List<BeanDefinition> beanDefinitions) {
+    public static Map<String, Bean> createBeans(List<BeanDefinition> beanDefinitions) {
         Map<String, Bean> beans = initializeBeans(beanDefinitions);
         injectValueDependencies(beans, beanDefinitions);
         injectRefDependencies(beans, beanDefinitions);
         return beans;
     }
 
-    private static Map<String, Bean> initializeBeans(List<BeanDefinition> beanDefinitions) {
+    static Map<String, Bean> initializeBeans(List<BeanDefinition> beanDefinitions) {
         Map<String, Bean> beans = new HashMap<>();
         for (BeanDefinition definition : beanDefinitions) {
             String beanId = definition.getId();
@@ -28,7 +28,8 @@ public class BeanCreator {
             try {
                 object = Class.forName(definition.getBeanClassName()).getConstructor().newInstance();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error("Failed to create bean instance for bean: {}", beanId, e);
+                throw new BeanInstantiationException("Bean creating failed: " + beanId, e);
             }
             Bean bean = new Bean(beanId, object);
             beans.put(beanId, bean);
@@ -36,7 +37,7 @@ public class BeanCreator {
         return beans;
     }
 
-    private static void injectValueDependencies(Map<String, Bean> beans, List<BeanDefinition> beanDefinitions) {
+    static void injectValueDependencies(Map<String, Bean> beans, List<BeanDefinition> beanDefinitions) {
         for (BeanDefinition beanDefinition : beanDefinitions) {
             Bean bean = beans.get(beanDefinition.getId());
             if (bean != null) {
@@ -51,7 +52,7 @@ public class BeanCreator {
         }
     }
 
-    private static void injectRefDependencies(Map<String, Bean> beans, List<BeanDefinition> beanDefinitions) {
+    static void injectRefDependencies(Map<String, Bean> beans, List<BeanDefinition> beanDefinitions) {
         for (BeanDefinition beanDefinition : beanDefinitions) {
             Bean bean = beans.get(beanDefinition.getId());
             if (bean != null) {
@@ -66,57 +67,56 @@ public class BeanCreator {
                         setPropertyValue(beanInstance, propertyName, refBeanInstance);
                     } else {
                         log.error("Failed to find reference bean with id: {}", refBeanId);
+                        throw new BeanInstantiationException("Can't find reference: " + refBeanId);
                     }
                 }
             }
         }
     }
 
-
-    private static void setPropertyValue(Object beanInstance, String propertyName, Object propertyValue) {
+    static void setPropertyValue(Object beanInstance, String propertyName, Object propertyValue) {
         try {
             Class<?> beanClass = beanInstance.getClass();
             Field field = beanClass.getDeclaredField(propertyName);
             field.setAccessible(true);
 
             Class<?> fieldType = field.getType();
-            Object convertedValue = null;
-
-            if (fieldType.isAssignableFrom(propertyValue.getClass())) {
-                convertedValue = propertyValue;
-            } else if (fieldType == int.class || fieldType == Integer.class) {
-                convertedValue = Integer.parseInt(propertyValue.toString());
-            } else if (fieldType == long.class || fieldType == Long.class) {
-                convertedValue = Long.parseLong(propertyValue.toString());
-            } else if (fieldType == double.class || fieldType == Double.class) {
-                convertedValue = Double.parseDouble(propertyValue.toString());
-            } else if (fieldType == float.class || fieldType == Float.class) {
-                convertedValue = Float.parseFloat(propertyValue.toString());
-            } else if (fieldType == short.class || fieldType == Short.class) {
-                convertedValue = Short.parseShort(propertyValue.toString());
-            } else if (fieldType == byte.class || fieldType == Byte.class) {
-                convertedValue = Byte.parseByte(propertyValue.toString());
-            } else if (fieldType == boolean.class || fieldType == Boolean.class) {
-                convertedValue = Boolean.parseBoolean(propertyValue.toString());
-            } else if (fieldType == char.class || fieldType == Character.class) {
-                if (propertyValue.toString().length() > 0) {
-                    convertedValue = propertyValue.toString().charAt(0);
-                }
-            } else {
-                log.error("Failed to set property value for property: {} on bean instance: {}. Unsupported data type.",
-                        propertyName, beanInstance);
-                throw new BeanInstantiationException("Unsupported data type for property: " + propertyName);
-            }
+            Object convertedValue = obtainValue(propertyValue, fieldType);
 
             field.set(beanInstance, convertedValue);
-        } catch (NoSuchFieldException e) {
-            log.error("Failed to set property value for property: {} on bean instance: {}. Property not found.",
-                    propertyName, beanInstance);
-            throw new BeanInstantiationException("Property not found: " + propertyName, e);
         } catch (Exception e) {
             log.error("Failed to set property value for property: {} on bean instance: {}",
                     propertyName, beanInstance, e);
             throw new BeanInstantiationException("Failed to set property value.", e);
         }
+    }
+
+    static Object obtainValue(Object propertyValue, Class<?> fieldType) {
+        Object value = null;
+        if (fieldType.isAssignableFrom(propertyValue.getClass())) {
+            value = propertyValue;
+        } else if (fieldType == int.class) {
+            value = Integer.parseInt(propertyValue.toString());
+        } else if (fieldType == long.class) {
+            value = Long.parseLong(propertyValue.toString());
+        } else if (fieldType == double.class) {
+            value = Double.parseDouble(propertyValue.toString());
+        } else if (fieldType == float.class) {
+            value = Float.parseFloat(propertyValue.toString());
+        } else if (fieldType == short.class) {
+            value = Short.parseShort(propertyValue.toString());
+        } else if (fieldType == byte.class) {
+            value = Byte.parseByte(propertyValue.toString());
+        } else if (fieldType == boolean.class) {
+            value = Boolean.parseBoolean(propertyValue.toString());
+        } else if (fieldType == char.class) {
+            if (propertyValue.toString().length() > 0) {
+                value = propertyValue.toString().charAt(0);
+            }
+        } else {
+            log.error("Failed to set property value.");
+            throw new BeanInstantiationException("Unsupported data type.");
+        }
+        return value;
     }
 }

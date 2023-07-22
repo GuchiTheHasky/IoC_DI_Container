@@ -2,12 +2,10 @@ package com.husky.container.entity;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class Bean {
     private String id;
     private Object value;

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans>
+    <bean id="paymentService" class="com.husky.container.entity.PaymentService">
+        <property name="mailService" ref="mailService" />
+        <property name="paymentType" value="visa" />
+    </bean>
+
+    <bean id="payService" class="com.husky.container.entity.PaymentService">
+        <property name="mailService" ref="mailService" />
+        <property name="paymentType" value="visa" />
+    </bean>
+
+    <bean id="mailService" class="com.husky.container.entity.MailService">
+        <property name="protocol" value="POP3" />
+        <property name="timeout" value="2000" />
+    </bean>
+</beans>

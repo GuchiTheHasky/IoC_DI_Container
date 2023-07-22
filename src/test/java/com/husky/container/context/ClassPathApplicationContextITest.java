@@ -1,28 +1,31 @@
 package com.husky.container.context;
 
-import com.husky.container.entity.*;
+import com.husky.container.entity.MailService;
+import com.husky.container.entity.PaymentService;
+import com.husky.container.entity.UserService;
 import com.husky.container.exception.BeanInstantiationException;
+import com.husky.container.reader.sax.SAXBeanDefinitionReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class ClassPathApplicationContextITest {
-    private final ClassPathApplicationContext appContext =
+    private final ClassPathApplicationContext DOM_CONTEXT =
             new ClassPathApplicationContext("default_content_test.xml", "default_import_content_test.xml");
+    private final ClassPathApplicationContext SAX_CONTEXT =
+            new ClassPathApplicationContext
+                    (new SAXBeanDefinitionReader("default_content_test.xml", "default_import_content_test.xml"));
+    private static final String MULTIPLY_BEAN_DEFINITION_PATH = "multiply_beans_content_test.xml";
 
     @Test
-    @DisplayName("Test, create bean with value and ref dependencies, used id and class")
-    public void testCreateBeansWithValueAndRefDependenciesUsedIdAndClass() {
-        PaymentService paymentService = appContext.getBean("paymentService", PaymentService.class);
-        MailService mailService = appContext.getBean("mailService", MailService.class);
-        UserService userService = appContext.getBean("userService", UserService.class);
+    @DisplayName("Test (DOM), getBean(String id, Class<?> clazz);")
+    public void testDOMGetBeanWithValueAndRefDependenciesUsedIdAndClass() {
+        PaymentService paymentService = DOM_CONTEXT.getBean("paymentService", PaymentService.class);
+        MailService mailService = DOM_CONTEXT.getBean("mailService", MailService.class);
+        UserService userService = DOM_CONTEXT.getBean("userService", UserService.class);
 
         String expectedPaymentType = "visa";
         String expectedMailServiceProtocol = "POP3";
@@ -43,11 +46,36 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test, create bean with value and ref dependencies, used class")
-    public void testCreateBeansWithValueAndRefDependenciesUsedClass() {
-        PaymentService paymentService = appContext.getBean(PaymentService.class);
-        MailService mailService = appContext.getBean(MailService.class);
-        UserService userService = appContext.getBean(UserService.class);
+    @DisplayName("Test (SAX), getBean(String id, Class<?> clazz);")
+    public void testSAXGetBeanWithValueAndRefDependenciesUsedIdAndClass() {
+        PaymentService saxPaymentService = SAX_CONTEXT.getBean("paymentService", PaymentService.class);
+        MailService saxMailService = SAX_CONTEXT.getBean("mailService", MailService.class);
+        UserService saxUserService = SAX_CONTEXT.getBean("userService", UserService.class);
+
+        String expectedPaymentType = "visa";
+        String expectedMailServiceProtocol = "POP3";
+        int expectedMailServiceTimeout = 2000;
+
+        assertNotNull(saxPaymentService);
+        assertNotNull(saxPaymentService.getMailService());
+        assertNotNull(saxMailService);
+        assertNotNull(saxUserService);
+        assertNotNull(saxUserService.getMailService());
+
+        assertEquals(expectedPaymentType, saxPaymentService.getPaymentType());
+        assertEquals(expectedMailServiceProtocol, saxMailService.getProtocol());
+        assertEquals(expectedMailServiceTimeout, saxMailService.getTimeout());
+
+        assertSame(saxMailService, saxPaymentService.getMailService());
+        assertSame(saxMailService, saxUserService.getMailService());
+    }
+
+    @Test
+    @DisplayName("Test (DOM), getBean(Class<?> clazz);")
+    public void testDOMGetBeanWithValueAndRefDependenciesUsedClass() {
+        PaymentService paymentService = DOM_CONTEXT.getBean(PaymentService.class);
+        MailService mailService = DOM_CONTEXT.getBean(MailService.class);
+        UserService userService = DOM_CONTEXT.getBean(UserService.class);
 
         String expectedPaymentType = "visa";
         String expectedMailServiceProtocol = "POP3";
@@ -68,11 +96,11 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test, create bean with value and ref dependencies, used id")
-    public void testCreateBeansWithValueAndRefDependenciesUsedId() {
-        PaymentService paymentService = (PaymentService) appContext.getBean("paymentService");
-        MailService mailService = (MailService) appContext.getBean("mailService");
-        UserService userService = (UserService) appContext.getBean("userService");
+    @DisplayName("Test (SAX), getBean(Class<?> clazz);")
+    public void testSAXGetBeanWithValueAndRefDependenciesUsedClass() {
+        PaymentService paymentService = SAX_CONTEXT.getBean(PaymentService.class);
+        MailService mailService = SAX_CONTEXT.getBean(MailService.class);
+        UserService userService = SAX_CONTEXT.getBean(UserService.class);
 
         String expectedPaymentType = "visa";
         String expectedMailServiceProtocol = "POP3";
@@ -93,9 +121,59 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test, create bean with value dependencies, used id and class")
-    public void testGetListOfBeans() {
-        List<String> beans = appContext.getBeansNames();
+    @DisplayName("Test (DOM), getBean(String id);")
+    public void testDOMGetBeansWithValueAndRefDependenciesUsedId() {
+        PaymentService paymentService = (PaymentService) DOM_CONTEXT.getBean("paymentService");
+        MailService mailService = (MailService) DOM_CONTEXT.getBean("mailService");
+        UserService userService = (UserService) DOM_CONTEXT.getBean("userService");
+
+        String expectedPaymentType = "visa";
+        String expectedMailServiceProtocol = "POP3";
+        int expectedMailServiceTimeout = 2000;
+
+        assertNotNull(paymentService);
+        assertNotNull(paymentService.getMailService());
+        assertNotNull(mailService);
+        assertNotNull(userService);
+        assertNotNull(userService.getMailService());
+
+        assertEquals(expectedPaymentType, paymentService.getPaymentType());
+        assertEquals(expectedMailServiceProtocol, mailService.getProtocol());
+        assertEquals(expectedMailServiceTimeout, mailService.getTimeout());
+
+        assertSame(mailService, paymentService.getMailService());
+        assertSame(mailService, userService.getMailService());
+    }
+
+    @Test
+    @DisplayName("Test (SAX), getBean(String id);")
+    public void testSAXGetBeansWithValueAndRefDependenciesUsedId() {
+        PaymentService paymentService = (PaymentService) SAX_CONTEXT.getBean("paymentService");
+        MailService mailService = (MailService) SAX_CONTEXT.getBean("mailService");
+        UserService userService = (UserService) SAX_CONTEXT.getBean("userService");
+
+        String expectedPaymentType = "visa";
+        String expectedMailServiceProtocol = "POP3";
+        int expectedMailServiceTimeout = 2000;
+
+        assertNotNull(paymentService);
+        assertNotNull(paymentService.getMailService());
+        assertNotNull(mailService);
+        assertNotNull(userService);
+        assertNotNull(userService.getMailService());
+
+        assertEquals(expectedPaymentType, paymentService.getPaymentType());
+        assertEquals(expectedMailServiceProtocol, mailService.getProtocol());
+        assertEquals(expectedMailServiceTimeout, mailService.getTimeout());
+
+        assertSame(mailService, paymentService.getMailService());
+        assertSame(mailService, userService.getMailService());
+    }
+
+    @Test
+    @DisplayName("Test (DOM), getBeansNames();")
+    public void testDOMGetListOfBeans() {
+        List<String> beans = DOM_CONTEXT.getBeansNames();
         String expectedFirstBean = "paymentService";
         String expectedSecondBean = "mailService";
         String expectedThirdBean = "userService";
@@ -108,56 +186,31 @@ public class ClassPathApplicationContextITest {
         assertEquals(expectedThirdBean, beans.get(2));
     }
 
-//    @Test
-//    @DisplayName("Test, create bean from bean definition.")
-//    public void testCreateBeanFromBeanDefinition() {
-//        BeanDefinition beanDefinition = mock(BeanDefinition.class);
-//        when(beanDefinition.getBeanClassName()).thenReturn("com.husky.container.entity.MailService");
-//
-//        Object testBean = appContext.createBeanFromBeanDefinition(beanDefinition);
-//
-//        assertNotNull(testBean);
-//
-//        assertEquals(MailService.class, testBean.getClass());
-//    }
-
     @Test
-    @DisplayName("Test, create bean from bean definition throw exception.")
-    public void testCreateBeanFromBeanDefinitionThrowException() {
-        BeanDefinition beanDefinition = mock(BeanDefinition.class);
-        when(beanDefinition.getBeanClassName()).thenReturn("com.husky.container.entity.TestService");
+    @DisplayName("Test (SAX), getBeansNames();")
+    public void testSAXGetListOfBeans() {
+        List<String> beans = SAX_CONTEXT.getBeansNames();
+        String expectedFirstBean = "paymentService";
+        String expectedSecondBean = "mailService";
+        String expectedThirdBean = "userService";
+        int expectedListSize = 3;
 
-        assertThrows(BeanInstantiationException.class, () -> appContext.createBeanFromBeanDefinition(beanDefinition));
+        assertNotNull(beans);
+        assertEquals(expectedListSize, beans.size());
+        assertEquals(expectedFirstBean, beans.get(0));
+        assertEquals(expectedSecondBean, beans.get(1));
+        assertEquals(expectedThirdBean, beans.get(2));
     }
 
-//    @Test
-//    @DisplayName("Test, inject value dependencies.")
-//    public void testInjectPropertyDependencies() {
-//        Map<String, String> dependencies = new HashMap<>();
-//        dependencies.put("protocol", "POP3");
-//        dependencies.put("timeout", "2000");
-//
-//        MailService mailService = new MailService();
-//
-//        appContext.injectPropertyDependencies(dependencies, mailService);
-//
-//        assertEquals("POP3", mailService.getProtocol());
-//        assertEquals(2000, mailService.getTimeout());
-//    }
-
-//    @Test
-//    @DisplayName("Test, inject ref dependencies.")
-//    public void testInjectRefDependencies() {
-//        Map<String, String> refDependencies = new HashMap<>();
-//        refDependencies.put("mailService", "mailService");
-//
-//        PaymentService paymentService = new PaymentService();
-//
-//        appContext.injectRefDependencies(refDependencies, paymentService);
-//        assertEquals(MailService.class, paymentService.getMailService().getClass());
-//        assertSame(appContext.getBean("mailService"), paymentService.getMailService());
-//    }
-
+    @Test
+    @DisplayName("Test, validate(Class<?> clazz);")
+    public void testValidateMultiplyClassInstanceThrowException() {
+        ClassPathApplicationContext domContext = new ClassPathApplicationContext(MULTIPLY_BEAN_DEFINITION_PATH);
+        ClassPathApplicationContext saxContext = new ClassPathApplicationContext
+                (new SAXBeanDefinitionReader(MULTIPLY_BEAN_DEFINITION_PATH));
+        assertThrows(BeanInstantiationException.class, () -> domContext.validateClass(PaymentService.class));
+        assertThrows(BeanInstantiationException.class, () -> saxContext.validateClass(PaymentService.class));
+    }
 }
 
 

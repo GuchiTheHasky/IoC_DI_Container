@@ -17,7 +17,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="com.husky.container.reader.dom.XSDValidator" level="debug">
+    <logger name="com.husky.container.reader.xsd.XSDValidator" level="debug">
         <appender-ref ref="FILE"/>
     </logger>
 

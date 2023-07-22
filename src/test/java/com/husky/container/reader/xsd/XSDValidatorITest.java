@@ -1,4 +1,4 @@
-package com.husky.container.reader.dom;
+package com.husky.container.reader.xsd;
 
 import com.husky.container.exception.BeanInstantiationException;
 import org.junit.jupiter.api.DisplayName;
@@ -10,26 +10,26 @@ import java.io.InputStream;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class XSDValidatorTest {
+public class XSDValidatorITest {
     private final static String XSD_SCHEMA = "schema.xsd";
     @Test
     @DisplayName("Test validate XML schema throw exception")
     public void testValidateXMLSchemaThrowException() {
-        assertThrows(BeanInstantiationException.class, () -> XSDValidator.validate(noXML(), XSD_SCHEMA));
+        assertThrows(BeanInstantiationException.class, () -> XSDValidator.validate(invalidXML(), XSD_SCHEMA));
     }
 
     @Test
     @DisplayName("Test validate XML schema")
     public void testValidateXMLSchema() {
-        assertDoesNotThrow(() -> XSDValidator.validate(realXML(), XSD_SCHEMA));
+        assertDoesNotThrow(() -> XSDValidator.validate(validXML(), XSD_SCHEMA));
     }
 
-    private InputStream noXML() {
+    private InputStream invalidXML() {
         return new ByteArrayInputStream("Incorrect XML".getBytes());
     }
 
-    private InputStream realXML() {
-        String content = """
+    private InputStream validXML() {
+        return new ByteArrayInputStream("""
                 <?xml version="1.0" encoding="UTF-8" ?>
                 <beans>
                     <import resource="classpath:default_import_content_test.xml" />
@@ -43,7 +43,6 @@ public class XSDValidatorTest {
                         <property name="protocol" value="POP3" />
                         <property name="timeout" value="2000" />
                     </bean>
-                </beans>""";
-        return new ByteArrayInputStream(content.getBytes());
+                </beans>""".getBytes());
     }
 }

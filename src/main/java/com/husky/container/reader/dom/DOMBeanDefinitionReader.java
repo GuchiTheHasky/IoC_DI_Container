@@ -1,8 +1,9 @@
 package com.husky.container.reader.dom;
 
 import com.husky.container.entity.BeanDefinition;
-import com.husky.container.exception.DOMReaderException;
+import com.husky.container.exception.XMLReaderException;
 import com.husky.container.reader.BeanDefinitionReader;
+import com.husky.container.reader.xsd.XSDValidator;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
@@ -16,7 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Setter
@@ -33,7 +33,7 @@ public class DOMBeanDefinitionReader implements BeanDefinitionReader {
         try {
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (Exception e) {
-            throw new DOMReaderException("Failed to create DocumentBuilder", e);
+            throw new XMLReaderException("Failed to create DocumentBuilder", e);
         }
     }
 
@@ -47,7 +47,7 @@ public class DOMBeanDefinitionReader implements BeanDefinitionReader {
                 String id = beanElement.getAttribute("id");
                 String className = beanElement.getAttribute("class");
 
-                BeanDefinition beanDefinition = buildBeanDefinition(id, className);
+                BeanDefinition beanDefinition = BeanDefinition.buildBeanDefinition(id, className);
                 fillDependency(beanElement, beanDefinition);
                 beanDefinitions.add(beanDefinition);
             }
@@ -75,15 +75,6 @@ public class DOMBeanDefinitionReader implements BeanDefinitionReader {
         return getClass().getResourceAsStream("/" + path);
     }
 
-    BeanDefinition buildBeanDefinition(String id, String className) {
-        return BeanDefinition.builder()
-                .id(id)
-                .beanClassName(className)
-                .dependencies(new HashMap<>())
-                .refDependencies(new HashMap<>())
-                .build();
-    }
-
     NodeList getBeanList(String path) {
         try (InputStream inputStream = getResourceAsStream(path)) {
             ByteArrayInputStream content = new ByteArrayInputStream(inputStream.readAllBytes());
@@ -94,7 +85,7 @@ public class DOMBeanDefinitionReader implements BeanDefinitionReader {
             return root.getElementsByTagName("bean");
         } catch (IOException | SAXException e) {
             log.error("Failed to parse XML content.", e);
-            throw new DOMReaderException("Application initialization failed.", e);
+            throw new XMLReaderException("Application initialization failed.", e);
         }
     }
 }

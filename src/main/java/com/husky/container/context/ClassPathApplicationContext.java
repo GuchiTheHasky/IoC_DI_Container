@@ -1,6 +1,8 @@
 package com.husky.container.context;
 
 import com.husky.container.entity.*;
+import com.husky.container.exception.BeanInstantiationException;
+import com.husky.container.exception.NoUniqueBeanDefinitionException;
 import com.husky.container.reader.BeanDefinitionReader;
 import com.husky.container.reader.dom.DOMBeanDefinitionReader;
 import com.husky.container.reader.sax.SAXBeanDefinitionReader;
@@ -28,20 +30,22 @@ public class ClassPathApplicationContext implements ApplicationContext {
 
     @Override
     public <T> T getBean(Class<T> clazz) {
-        // todo NoUniqueBeanDefinitionException
+        validateClass(clazz);
         for (Bean bean : beans.values()) {
             if (clazz.isInstance(bean.getValue())) {
-                return (T) bean.getValue();
+                return clazz.cast(bean.getValue());
             }
         }
         return null;
     }
 
     @Override
-    public <T> T getBean(String name, Class<T> clazz) {
+    public <T> T getBean(String id, Class<T> clazz) {
+        validateId(id);
+        validateClass(clazz);
         for (Bean bean : beans.values()) {
-            if (bean.getId().equals(name) && clazz.isInstance(bean.getValue())) {
-                return (T) bean.getValue();
+            if (bean.getId().equals(id) && clazz.isInstance(bean.getValue())) {
+                return clazz.cast(bean.getValue());
             }
         }
         return null;
@@ -49,6 +53,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
 
     @Override
     public Object getBean(String id) {
+        validateId(id);
         return beans.get(id).getValue();
     }
 
@@ -57,15 +62,17 @@ public class ClassPathApplicationContext implements ApplicationContext {
         return new ArrayList<>(beans.keySet());
     }
 
-    private void validateId(String id) {
+    void validateId(String id) {
         if (id == null || id.isEmpty()) {
-            throw new IllegalArgumentException("Bean id must not be null or empty");
+            log.error("Bean id must not be null or empty");
+            throw new BeanInstantiationException("Bean id must not be null or empty");
         }
     }
 
-    private void validateClass(Class<?> clazz) {
+    void validateClass(Class<?> clazz) {
         if (clazz == null) {
-            throw new IllegalArgumentException("Bean class must not be null");
+            log.error("Bean class must not be null");
+            throw new BeanInstantiationException("Bean class must not be null");
         }
         int sameClassCount = 0;
         for (Bean bean : beans.values()) {
@@ -74,7 +81,8 @@ public class ClassPathApplicationContext implements ApplicationContext {
             }
         }
         if (sameClassCount > 1) {
-            throw new IllegalArgumentException("No unique bean of class " + clazz.getName());
+            log.error("No unique bean of class: {}", clazz.getName());
+            throw new NoUniqueBeanDefinitionException("No unique bean of class: " + clazz.getName());
         }
     }
 }

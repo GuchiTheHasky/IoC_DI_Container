@@ -1,5 +1,6 @@
 target/
 .idea
+logs
 src/main/java/draft
 src/main/resources/config.xml
 src/main/resources/context.xml
@@ -46,3 +47,5 @@ build/
 /src/main/java/com/husky/container/entity/MailService.java
 /src/main/java/com/husky/container/entity/PaymentService.java
 /src/main/java/com/husky/container/entity/UserService.java
+/src/main/resources/multiply_beans_content_test.xml
+/logs/

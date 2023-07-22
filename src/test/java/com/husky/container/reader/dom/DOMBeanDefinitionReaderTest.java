@@ -2,7 +2,6 @@ package com.husky.container.reader.dom;
 
 import com.husky.container.entity.BeanDefinition;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -17,44 +16,33 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DOMBeanDefinitionReaderTest { // todo розділити інтеграційні тести від юніт тестів
-    private final DOMBeanDefinitionReader reader = new DOMBeanDefinitionReader();
-
-    @BeforeEach
-    public void init() {
-        reader.setPaths(new String[]{"default_content_test.xml"});
-    }
+public class DOMBeanDefinitionReaderTest {
+    private final DOMBeanDefinitionReader DOM_READER =
+            new DOMBeanDefinitionReader("default_content_test.xml", "default_import_content_test.xml");
 
     @Test
     @DisplayName("Test, read BeanDefinition.")
     public void testReadBeanDefinition() {
-        List<BeanDefinition> beanDefinitions = reader.readBeanDefinition();
-        int expectedBeanCount = 2;
+        List<BeanDefinition> beanDefinitions = DOM_READER.readBeanDefinition();
+        int expectedBeanCount = 3;
         int actualBeanCount = beanDefinitions.size();
+
         assertNotNull(beanDefinitions);
         assertEquals(expectedBeanCount, actualBeanCount);
+
+        assertTrue(beanDefinitions.stream().anyMatch(beanDefinition -> beanDefinition.getId().equals("paymentService")));
+        assertTrue(beanDefinitions.stream().anyMatch(beanDefinition -> beanDefinition.getId().equals("mailService")));
+        assertTrue(beanDefinitions.stream().anyMatch(beanDefinition -> beanDefinition.getId().equals("userService")));
     }
 
     @Test
     @DisplayName("Test, get resource as stream.")
     public void testGetResourceAsStream() {
-        InputStream inputStream = reader.getResourceAsStream("default_content_test.xml");
+        InputStream inputStream = DOM_READER.getResourceAsStream("default_content_test.xml");
         assertNotNull(inputStream);
-    }
-
-    @Test
-    @DisplayName("Test, build BeanDefinition.")
-    public void testBuildBeanDefinition() {
-        String id = "beanId";
-        String className = "com.example.BeanClass";
-        BeanDefinition beanDefinition = reader.buildBeanDefinition(id, className);
-        assertNotNull(beanDefinition);
-        assertEquals(id, beanDefinition.getId());
-        assertEquals(className, beanDefinition.getBeanClassName());
-        assertNotNull(beanDefinition.getDependencies());
     }
 
     @Test
@@ -66,7 +54,7 @@ public class DOMBeanDefinitionReaderTest { // todo розділити інтег
         Document document = documentBuilder.parse(new InputSource(new StringReader(getTestXMLContent())));
 
         NodeList expectedNodeList = document.getElementsByTagName("bean");
-        NodeList actualNodeList = reader.getBeanList("default_content_test.xml");
+        NodeList actualNodeList = DOM_READER.getBeanList("default_content_test.xml");
 
         assertEquals(expectedNodeList.getLength(), actualNodeList.getLength());
         assertEquals(expectedNodeList.item(0).getNodeName(), actualNodeList.item(0).getNodeName());
@@ -87,7 +75,7 @@ public class DOMBeanDefinitionReaderTest { // todo розділити інтег
         beanDefinition.setDependencies(new HashMap<>());
         beanDefinition.setRefDependencies(new HashMap<>());
 
-        reader.fillDependency(beanElement, beanDefinition);
+        DOM_READER.fillDependency(beanElement, beanDefinition);
 
         int expectedDependenciesCount = 1;
         int expectedRefDependenciesCount = 1;
@@ -110,12 +98,12 @@ public class DOMBeanDefinitionReaderTest { // todo розділити інтег
                 <?xml version="1.0" encoding="UTF-8" ?>
                 <beans>
                     <import resource="classpath:default_import_content_test.xml" />
-                 
+                                
                     <bean id="paymentService" class="com.husky.container.entity.PaymentService">
                         <property name="mailService" ref="mailService" />
                         <property name="paymentType" value="visa" />
                     </bean>
-                 
+                                
                     <bean id="mailService" class="com.husky.container.entity.MailService">
                         <property name="protocol" value="POP3" />
                         <property name="timeout" value="2000" />

@@ -1,4 +1,4 @@
-package com.husky.container.reader.dom;
+package com.husky.container.reader.xsd;
 
 import com.husky.container.exception.BeanInstantiationException;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.InputStream;
 
-// зробити SAXXMLBeanDefinitionReader
 @Slf4j
 public class XSDValidator {
     private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
