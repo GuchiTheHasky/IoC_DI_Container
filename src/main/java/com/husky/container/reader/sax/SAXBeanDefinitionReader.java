@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 public class SAXBeanDefinitionReader implements BeanDefinitionReader {
-    private final static String XSD_SCHEMA = "schema.xsd";
+    private final static String XSD_SCHEMA = "xsd/schema.xsd";
     private final String[] paths;
     private final SAXParser saxParser;
 
@@ -52,6 +52,6 @@ public class SAXBeanDefinitionReader implements BeanDefinitionReader {
     }
 
     private InputStream getResourceAsStream(String path) {
-        return getClass().getResourceAsStream("/" + path);
+        return getClass().getResourceAsStream("/context/" + path);
     }
 }

@@ -6,7 +6,7 @@
     <artifactId>ioc-di-container</artifactId>
 
     <name>IoC</name>
-    <version>2.0</version>
+    <version>3.0</version>
     <url>https://github.com/GuchiTheHasky/IoC_DI_Container</url>
     <description>Inversion of Control and Dependency Injection Container</description>
 

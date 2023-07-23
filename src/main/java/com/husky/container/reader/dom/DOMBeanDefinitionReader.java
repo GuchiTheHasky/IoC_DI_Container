@@ -22,7 +22,7 @@ import java.util.List;
 @Setter
 @Slf4j
 public class DOMBeanDefinitionReader implements BeanDefinitionReader {
-    private final static String XSD_SCHEMA = "schema.xsd";
+    private final static String XSD_SCHEMA = "xsd/schema.xsd";
     private String[] paths;
     private DocumentBuilderFactory documentBuilderFactory;
     private DocumentBuilder documentBuilder;
@@ -72,7 +72,7 @@ public class DOMBeanDefinitionReader implements BeanDefinitionReader {
     }
 
     InputStream getResourceAsStream(String path) {
-        return getClass().getResourceAsStream("/" + path);
+        return getClass().getResourceAsStream("/context/" + path);
     }
 
     NodeList getBeanList(String path) {

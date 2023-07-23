@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class XSDValidatorITest {
-    private final static String XSD_SCHEMA = "schema.xsd";
+    private final static String XSD_SCHEMA = "xsd/schema.xsd";
     @Test
     @DisplayName("Test validate XML schema throw exception")
     public void testValidateXMLSchemaThrowException() {
