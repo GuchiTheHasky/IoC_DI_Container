@@ -21,7 +21,7 @@ public class ClassPathApplicationContextITest {
     private static final String MULTIPLY_BEAN_DEFINITION_PATH = "multiply_beans_content_test.xml";
 
     @Test
-    @DisplayName("Test (DOM), getBean(String id, Class<?> clazz);")
+    @DisplayName("Test (DOM), create Beans, used Id & Clazz;")
     public void testDOMGetBeanWithValueAndRefDependenciesUsedIdAndClass() {
         PaymentService paymentService = DOM_CONTEXT.getBean("paymentService", PaymentService.class);
         MailService mailService = DOM_CONTEXT.getBean("mailService", MailService.class);
@@ -46,7 +46,7 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test (SAX), getBean(String id, Class<?> clazz);")
+    @DisplayName("Test (SAX), create Beans, used Id & Clazz;")
     public void testSAXGetBeanWithValueAndRefDependenciesUsedIdAndClass() {
         PaymentService saxPaymentService = SAX_CONTEXT.getBean("paymentService", PaymentService.class);
         MailService saxMailService = SAX_CONTEXT.getBean("mailService", MailService.class);
@@ -71,7 +71,7 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test (DOM), getBean(Class<?> clazz);")
+    @DisplayName("Test (DOM), create Beans, used Clazz;")
     public void testDOMGetBeanWithValueAndRefDependenciesUsedClass() {
         PaymentService paymentService = DOM_CONTEXT.getBean(PaymentService.class);
         MailService mailService = DOM_CONTEXT.getBean(MailService.class);
@@ -96,7 +96,7 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test (SAX), getBean(Class<?> clazz);")
+    @DisplayName("Test (SAX), create Beans, used Clazz;")
     public void testSAXGetBeanWithValueAndRefDependenciesUsedClass() {
         PaymentService paymentService = SAX_CONTEXT.getBean(PaymentService.class);
         MailService mailService = SAX_CONTEXT.getBean(MailService.class);
@@ -121,7 +121,7 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test (DOM), getBean(String id);")
+    @DisplayName("Test (DOM), create Beans, used Id;")
     public void testDOMGetBeansWithValueAndRefDependenciesUsedId() {
         PaymentService paymentService = (PaymentService) DOM_CONTEXT.getBean("paymentService");
         MailService mailService = (MailService) DOM_CONTEXT.getBean("mailService");
@@ -146,7 +146,7 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test (SAX), getBean(String id);")
+    @DisplayName("Test (SAX), create Beans, used Id;")
     public void testSAXGetBeansWithValueAndRefDependenciesUsedId() {
         PaymentService paymentService = (PaymentService) SAX_CONTEXT.getBean("paymentService");
         MailService mailService = (MailService) SAX_CONTEXT.getBean("mailService");
@@ -171,7 +171,7 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test (DOM), getBeansNames();")
+    @DisplayName("Test (DOM), get Bean names;")
     public void testDOMGetListOfBeans() {
         List<String> beans = DOM_CONTEXT.getBeansNames();
         String expectedFirstBean = "paymentService";
@@ -187,7 +187,7 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test (SAX), getBeansNames();")
+    @DisplayName("Test (SAX), get Bean names;")
     public void testSAXGetListOfBeans() {
         List<String> beans = SAX_CONTEXT.getBeansNames();
         String expectedFirstBean = "paymentService";
@@ -203,7 +203,7 @@ public class ClassPathApplicationContextITest {
     }
 
     @Test
-    @DisplayName("Test, validate(Class<?> clazz);")
+    @DisplayName("Test, validate multiply clazz;")
     public void testValidateMultiplyClassInstanceThrowException() {
         ClassPathApplicationContext domContext = new ClassPathApplicationContext(MULTIPLY_BEAN_DEFINITION_PATH);
         ClassPathApplicationContext saxContext = new ClassPathApplicationContext
