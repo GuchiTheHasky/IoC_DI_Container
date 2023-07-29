@@ -38,9 +38,10 @@ public class SAXBeanDefinitionReader implements BeanDefinitionReader {
     @Override
     public List<BeanDefinition> readBeanDefinition() {
         List<BeanDefinition> beanDefinitions = new ArrayList<>();
-        SAXHandler handler = new SAXHandler();
+
         for (String path : paths) {
             try (InputStream content = getResourceAsStream(path)) {
+                SAXHandler handler = new SAXHandler();
                 saxParser.parse(content, handler);
                 beanDefinitions.addAll(handler.getBeanDefinitions());
             } catch (Exception e) {
