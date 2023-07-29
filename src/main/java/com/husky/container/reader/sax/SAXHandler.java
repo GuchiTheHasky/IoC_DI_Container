@@ -40,4 +40,9 @@ public class SAXHandler extends DefaultHandler {
             currentBeanDefinition = null;
         }
     }
+
+    public void reset() {
+        beanDefinitions.clear();
+        currentBeanDefinition = null;
+    }
 }

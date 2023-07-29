@@ -17,18 +17,19 @@ import java.util.List;
 @Slf4j
 public class SAXBeanDefinitionReader implements BeanDefinitionReader {
     private final static String XSD_SCHEMA = "xsd/schema.xsd";
+    private final SAXParser SAX_PARSER;
+    private final SAXHandler SAX_HANDLER;
     private final String[] paths;
-    private final SAXParser saxParser;
 
     public SAXBeanDefinitionReader(String... paths) {
         this.paths = paths;
-
+        this.SAX_HANDLER = new SAXHandler();
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try {
             Schema schema = schemaFactory.newSchema(getClass().getResource("/" + XSD_SCHEMA));
             SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
             saxParserFactory.setSchema(schema);
-            saxParser = saxParserFactory.newSAXParser();
+            SAX_PARSER = saxParserFactory.newSAXParser();
         } catch (Exception e) {
             log.error("Failed to create SAXParser", e);
             throw new XMLReaderException("Error occurred while creating SAXParser.");
@@ -41,9 +42,9 @@ public class SAXBeanDefinitionReader implements BeanDefinitionReader {
 
         for (String path : paths) {
             try (InputStream content = getResourceAsStream(path)) {
-                SAXHandler handler = new SAXHandler();
-                saxParser.parse(content, handler);
-                beanDefinitions.addAll(handler.getBeanDefinitions());
+                SAX_HANDLER.reset();
+                SAX_PARSER.parse(content, SAX_HANDLER);
+                beanDefinitions.addAll(SAX_HANDLER.getBeanDefinitions());
             } catch (Exception e) {
                 log.error("Failed to read bean definition from path: {}", path, e);
                 throw new XMLReaderException("Error occurred while reading bean definitions.");
