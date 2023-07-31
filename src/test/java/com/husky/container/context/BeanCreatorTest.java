@@ -1,4 +1,4 @@
-package com.husky.container.util;
+package com.husky.container.context;
 
 import com.husky.container.entity.*;
 import lombok.Data;
@@ -10,21 +10,22 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BeanCreatorTest {
+    private final BeanCreator beanCreator = new BeanCreator();
 
     @Test
     @DisplayName("Test, setting property values;")
     public void testSetPropertyValues() {
         ValuesContainer valuesContainer = new ValuesContainer();
 
-        BeanCreator.setPropertyValue(valuesContainer, "byteValue", "1");
-        BeanCreator.setPropertyValue(valuesContainer, "shortValue", "12");
-        BeanCreator.setPropertyValue(valuesContainer, "intValue", "123");
-        BeanCreator.setPropertyValue(valuesContainer, "longValue", "1234");
-        BeanCreator.setPropertyValue(valuesContainer, "doubleValue", "12345.0");
-        BeanCreator.setPropertyValue(valuesContainer, "floatValue", "123456.0");
-        BeanCreator.setPropertyValue(valuesContainer, "charValue", "a");
-        BeanCreator.setPropertyValue(valuesContainer, "booleanValue", "true");
-        BeanCreator.setPropertyValue(valuesContainer, "stringValue", "1234567");
+        beanCreator.setPropertyValue(valuesContainer, "byteValue", "1");
+        beanCreator.setPropertyValue(valuesContainer, "shortValue", "12");
+        beanCreator.setPropertyValue(valuesContainer, "intValue", "123");
+        beanCreator.setPropertyValue(valuesContainer, "longValue", "1234");
+        beanCreator.setPropertyValue(valuesContainer, "doubleValue", "12345.0");
+        beanCreator.setPropertyValue(valuesContainer, "floatValue", "123456.0");
+        beanCreator.setPropertyValue(valuesContainer, "charValue", "a");
+        beanCreator.setPropertyValue(valuesContainer, "booleanValue", "true");
+        beanCreator.setPropertyValue(valuesContainer, "stringValue", "1234567");
 
         assertEquals(1, valuesContainer.getByteValue());
         assertEquals(12, valuesContainer.getShortValue());
@@ -50,15 +51,15 @@ public class BeanCreatorTest {
         boolean expectedBooleanValue = true;
         String expectedStringValue = "1234567";
 
-        Object actualByteValue = BeanCreator.obtainValue("1", byte.class);
-        Object actualShortValue = BeanCreator.obtainValue("12", short.class);
-        Object actualIntValue = BeanCreator.obtainValue("123", int.class);
-        Object actualLongValue = BeanCreator.obtainValue("1234", long.class);
-        Object actualDoubleValue = BeanCreator.obtainValue("12345.0", double.class);
-        Object actualFloatValue = BeanCreator.obtainValue("123456.0", float.class);
-        Object actualCharValue = BeanCreator.obtainValue("a", char.class);
-        Object actualBooleanValue = BeanCreator.obtainValue("true", boolean.class);
-        Object actualStringValue = BeanCreator.obtainValue("1234567", String.class);
+        Object actualByteValue = beanCreator.obtainValue("1", byte.class);
+        Object actualShortValue = beanCreator.obtainValue("12", short.class);
+        Object actualIntValue = beanCreator.obtainValue("123", int.class);
+        Object actualLongValue = beanCreator.obtainValue("1234", long.class);
+        Object actualDoubleValue = beanCreator.obtainValue("12345.0", double.class);
+        Object actualFloatValue = beanCreator.obtainValue("123456.0", float.class);
+        Object actualCharValue = beanCreator.obtainValue("a", char.class);
+        Object actualBooleanValue = beanCreator.obtainValue("true", boolean.class);
+        Object actualStringValue = beanCreator.obtainValue("1234567", String.class);
 
         assertEquals(expectedByteValue, actualByteValue);
         assertEquals(expectedShortValue, actualShortValue);
@@ -88,7 +89,7 @@ public class BeanCreatorTest {
         list.add(new BeanDefinition("userService", "com.husky.container.entity.UserService",
                 new HashMap<>(), Map.of("mailService", "mailService")));
 
-        BeanCreator.injectValueDependencies(beans, list);
+        beanCreator.injectValueDependencies(beans, list);
 
         String expectedPaymentType = "visa";
         String expectedProtocol = "POP3";
@@ -121,7 +122,7 @@ public class BeanCreatorTest {
         beanDefinitions.add(new BeanDefinition("userService", "com.husky.container.entity.UserService",
                 new HashMap<>(), Map.of("mailService", "mailService")));
 
-        BeanCreator.injectRefDependencies(beans, beanDefinitions);
+        beanCreator.injectRefDependencies(beans, beanDefinitions);
 
         UserService user = (UserService) beans.get("userService").getValue();
         PaymentService payment = (PaymentService) beans.get("paymentService").getValue();
@@ -150,7 +151,7 @@ public class BeanCreatorTest {
         beanDefinitions.add(new BeanDefinition("userService", "com.husky.container.entity.UserService",
                 new HashMap<>(), new HashMap<>()));
 
-        Map<String, Bean> beans = BeanCreator.initializeBeans(beanDefinitions);
+        Map<String, Bean> beans = beanCreator.initializeBeans(beanDefinitions);
 
         PaymentService paymentService = (PaymentService) beans.get("paymentService").getValue();
         MailService mailService = (MailService) beans.get("mailService").getValue();

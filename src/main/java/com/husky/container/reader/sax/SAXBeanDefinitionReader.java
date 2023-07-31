@@ -16,6 +16,8 @@ import java.util.List;
 
 @Slf4j
 public class SAXBeanDefinitionReader implements BeanDefinitionReader {
+    private static final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    private static final SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
     private final static String XSD_SCHEMA = "xsd/schema.xsd";
     private final SAXParser SAX_PARSER;
     private final SAXHandler SAX_HANDLER;
@@ -24,10 +26,9 @@ public class SAXBeanDefinitionReader implements BeanDefinitionReader {
     public SAXBeanDefinitionReader(String... paths) {
         this.paths = paths;
         this.SAX_HANDLER = new SAXHandler();
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
         try {
             Schema schema = schemaFactory.newSchema(getClass().getResource("/" + XSD_SCHEMA));
-            SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
             saxParserFactory.setSchema(schema);
             SAX_PARSER = saxParserFactory.newSAXParser();
         } catch (Exception e) {
@@ -54,6 +55,6 @@ public class SAXBeanDefinitionReader implements BeanDefinitionReader {
     }
 
     private InputStream getResourceAsStream(String path) {
-        return getClass().getResourceAsStream("/context/" + path);
+        return getClass().getResourceAsStream(path);
     }
 }

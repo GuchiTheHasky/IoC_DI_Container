@@ -14,11 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ClassPathApplicationContextITest {
     private final ClassPathApplicationContext DOM_CONTEXT =
-            new ClassPathApplicationContext("default_content_test.xml", "default_import_content_test.xml");
+            new ClassPathApplicationContext("/context/default_content_test.xml",
+                    "/context/default_import_content_test.xml");
     private final ClassPathApplicationContext SAX_CONTEXT =
             new ClassPathApplicationContext
-                    (new SAXBeanDefinitionReader("default_content_test.xml", "default_import_content_test.xml"));
-    private static final String MULTIPLY_BEAN_DEFINITION_PATH = "multiply_beans_content_test.xml";
+                    (new SAXBeanDefinitionReader("/context/default_content_test.xml",
+                            "/context/default_import_content_test.xml"));
+    private static final String MULTIPLY_BEAN_DEFINITION_PATH = "/context/multiply_beans_content_test.xml";
 
     @Test
     @DisplayName("Test (DOM), create Beans, used Id & Clazz;")

@@ -21,7 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DOMBeanDefinitionReaderTest {
     private final DOMBeanDefinitionReader DOM_READER =
-            new DOMBeanDefinitionReader("default_content_test.xml", "default_import_content_test.xml");
+            new DOMBeanDefinitionReader("/context/default_content_test.xml",
+                    "/context/default_import_content_test.xml");
 
     @Test
     @DisplayName("Test, read BeanDefinition.")
@@ -41,7 +42,7 @@ public class DOMBeanDefinitionReaderTest {
     @Test
     @DisplayName("Test, get resource as stream.")
     public void testGetResourceAsStream() {
-        InputStream inputStream = DOM_READER.getResourceAsStream("default_content_test.xml");
+        InputStream inputStream = DOM_READER.getResourceAsStream("/context/default_content_test.xml");
         assertNotNull(inputStream);
     }
 
@@ -54,7 +55,7 @@ public class DOMBeanDefinitionReaderTest {
         Document document = documentBuilder.parse(new InputSource(new StringReader(getTestXMLContent())));
 
         NodeList expectedNodeList = document.getElementsByTagName("bean");
-        NodeList actualNodeList = DOM_READER.getBeanList("default_content_test.xml");
+        NodeList actualNodeList = DOM_READER.getBeanList("/context/default_content_test.xml");
 
         assertEquals(expectedNodeList.getLength(), actualNodeList.getLength());
         assertEquals(expectedNodeList.item(0).getNodeName(), actualNodeList.item(0).getNodeName());

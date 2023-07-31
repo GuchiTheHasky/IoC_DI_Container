@@ -1,4 +1,4 @@
-package com.husky.container.util;
+package com.husky.container.context;
 
 import com.husky.container.entity.Bean;
 import com.husky.container.entity.BeanDefinition;
@@ -13,14 +13,14 @@ import java.util.Map;
 @Slf4j
 public class BeanCreator {
 
-    public static Map<String, Bean> createBeans(List<BeanDefinition> beanDefinitions) {
+    public Map<String, Bean> createBeans(List<BeanDefinition> beanDefinitions) {
         Map<String, Bean> beans = initializeBeans(beanDefinitions);
         injectValueDependencies(beans, beanDefinitions);
         injectRefDependencies(beans, beanDefinitions);
         return beans;
     }
 
-    static Map<String, Bean> initializeBeans(List<BeanDefinition> beanDefinitions) {
+    protected Map<String, Bean> initializeBeans(List<BeanDefinition> beanDefinitions) {
         Map<String, Bean> beans = new HashMap<>();
         for (BeanDefinition definition : beanDefinitions) {
             String beanId = definition.getId();
@@ -37,7 +37,7 @@ public class BeanCreator {
         return beans;
     }
 
-    static void injectValueDependencies(Map<String, Bean> beans, List<BeanDefinition> beanDefinitions) {
+    protected void injectValueDependencies(Map<String, Bean> beans, List<BeanDefinition> beanDefinitions) {
         for (BeanDefinition beanDefinition : beanDefinitions) {
             Bean bean = beans.get(beanDefinition.getId());
             if (bean != null) {
@@ -52,7 +52,7 @@ public class BeanCreator {
         }
     }
 
-    static void injectRefDependencies(Map<String, Bean> beans, List<BeanDefinition> beanDefinitions) {
+    protected void injectRefDependencies(Map<String, Bean> beans, List<BeanDefinition> beanDefinitions) {
         for (BeanDefinition beanDefinition : beanDefinitions) {
             Bean bean = beans.get(beanDefinition.getId());
             if (bean != null) {
@@ -74,7 +74,7 @@ public class BeanCreator {
         }
     }
 
-    static void setPropertyValue(Object beanInstance, String propertyName, Object propertyValue) {
+    protected void setPropertyValue(Object beanInstance, String propertyName, Object propertyValue) {
         try {
             Class<?> beanClass = beanInstance.getClass();
             Field field = beanClass.getDeclaredField(propertyName);
@@ -91,7 +91,7 @@ public class BeanCreator {
         }
     }
 
-    static Object obtainValue(Object propertyValue, Class<?> fieldType) {
+    protected Object obtainValue(Object propertyValue, Class<?> fieldType) {
         Object value = null;
         if (fieldType.isAssignableFrom(propertyValue.getClass())) {
             value = propertyValue;
@@ -114,7 +114,7 @@ public class BeanCreator {
                 value = propertyValue.toString().charAt(0);
             }
         } else {
-            log.error("Failed to set property value.");
+            log.error("Failed to set property value: {}; field type: {}", propertyValue, fieldType);
             throw new BeanInstantiationException("Unsupported data type.");
         }
         return value;

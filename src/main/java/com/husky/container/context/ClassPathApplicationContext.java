@@ -5,8 +5,6 @@ import com.husky.container.exception.BeanInstantiationException;
 import com.husky.container.exception.NoUniqueBeanDefinitionException;
 import com.husky.container.reader.BeanDefinitionReader;
 import com.husky.container.reader.dom.DOMBeanDefinitionReader;
-import com.husky.container.reader.sax.SAXBeanDefinitionReader;
-import com.husky.container.util.BeanCreator;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +23,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
 
     public ClassPathApplicationContext(BeanDefinitionReader beanReader) {
         List<BeanDefinition> beanDefinitions = beanReader.readBeanDefinition();
-        this.beans = BeanCreator.createBeans(beanDefinitions);
+        this.beans = new BeanCreator().createBeans(beanDefinitions);
     }
 
     @Override

@@ -72,7 +72,7 @@ public class DOMBeanDefinitionReader implements BeanDefinitionReader {
     }
 
     InputStream getResourceAsStream(String path) {
-        return getClass().getResourceAsStream("/context/" + path);
+        return getClass().getResourceAsStream(path);
     }
 
     NodeList getBeanList(String path) {

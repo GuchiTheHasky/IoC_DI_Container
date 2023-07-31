@@ -10,7 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SAXBeanDefinitionReaderTest {
     private final SAXBeanDefinitionReader SAX_READER =
-            new SAXBeanDefinitionReader("default_content_test.xml", "default_import_content_test.xml");
+            new SAXBeanDefinitionReader("/context/default_content_test.xml",
+                    "/context/default_import_content_test.xml");
 
     @Test
     @DisplayName("Test, read BeanDefinition.")
